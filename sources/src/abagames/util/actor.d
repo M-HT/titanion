@@ -5,7 +5,7 @@
  */
 module abagames.util.actor;
 
-private import std.stdarg;
+private import core.vararg;
 
 /**
  * Actor that has an interface to move and draw.
@@ -54,7 +54,7 @@ public class ActorPool(T) {
 
   protected void createActors(int n, Object[] args = null) {
     actors = new T[n];
-    foreach (inout T a; actors) {
+    foreach (ref T a; actors) {
       a = new T;
       a.exists = false;
       a.init(args);
@@ -69,8 +69,8 @@ public class ActorPool(T) {
     for (int i = 0; i < actors.length; i++) {
       actorIdx--;
       if (actorIdx < 0)
-        actorIdx = actors.length - 1;
-      if (!actors[actorIdx].exists) 
+        actorIdx = cast(int)(actors.length - 1);
+      if (!actors[actorIdx].exists)
         return actors[actorIdx];
     }
     hasNoActor = true;
@@ -80,7 +80,7 @@ public class ActorPool(T) {
   public T getInstanceForced() {
     actorIdx--;
     if (actorIdx < 0)
-      actorIdx = actors.length - 1;
+      actorIdx = cast(int)(actors.length - 1);
     return actors[actorIdx];
   }
 

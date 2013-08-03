@@ -5,7 +5,7 @@
  */
 module abagames.ttn.preference;
 
-private import std.stream;
+private import std.stdio;
 private import abagames.util.preference;
 
 /**
@@ -17,28 +17,26 @@ public class Preference: abagames.util.preference.Preference {
   static const int MODE_NUM = 3;
  private:
   static const int VERSION_NUM = 30;
-  static const char[] PREF_FILE_NAME = "ttn.prf";
+  static string PREF_FILE_NAME = "ttn.prf";
   int[RANKING_NUM][MODE_NUM] _highScore;
   int _lastMode;
 
   public void load() {
-    auto File fd = null;
+    scope File fd;
     try {
-      fd = new File(PREF_FILE_NAME, FileMode.In);
-      int ver;
-      fd.read(ver);
-      if (ver != VERSION_NUM)
-        throw new Error("Wrong version num");
-      fd.read(_lastMode);
-      for(int j = 0; j < MODE_NUM; j++)
-        for(int i = 0; i < RANKING_NUM; i++)
-          fd.read(_highScore[j][i]);
-    } catch (Object e) {
+      int read_data[1];
+      fd.open(PREF_FILE_NAME);
+      fd.rawRead(read_data);
+      if (read_data[0] != VERSION_NUM)
+        throw new Exception("Wrong version num");
+      fd.rawRead(read_data);
+      _lastMode = read_data[0];
+      fd.rawRead(_highScore);
+    } catch (Exception e) {
       init();
     } finally {
-      if (fd)
-        if (fd.isOpen())
-          fd.close();
+      if (fd.isOpen())
+        fd.close();
     }
   }
 
@@ -50,13 +48,15 @@ public class Preference: abagames.util.preference.Preference {
   }
 
   public void save() {
-    auto File fd = new File(PREF_FILE_NAME, FileMode.OutNew);
-    fd.write(VERSION_NUM);
-    fd.write(_lastMode);
-    for(int j = 0; j < MODE_NUM; j++)
-      for(int i = 0; i < RANKING_NUM; i++)
-        fd.write(_highScore[j][i]);
-    fd.close();
+    scope File fd;
+    try {
+      fd.open(PREF_FILE_NAME, "wb");
+      int write_data[2] = [VERSION_NUM, _lastMode];
+      fd.rawWrite(write_data);
+      fd.rawWrite(_highScore);
+    } finally {
+      fd.close();
+    }
   }
 
   public void setMode(int mode) {

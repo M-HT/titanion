@@ -78,6 +78,8 @@ public class Player: Token!(PlayerState, PlayerSpec) {
           hitOffset.y = pos.y - p.y;
           spec.addVelocity(state, v, hitOffset);
           break;
+        default:
+          break;
         }
         return true;
       }
@@ -147,6 +149,8 @@ public class Player: Token!(PlayerState, PlayerSpec) {
       return true;
     case GameState.Mode.MODERN:
       return false;
+    default:
+      return false;
     }
   }
 }
@@ -178,7 +182,7 @@ public class PlayerState: TokenState {
   int ghostShotCnt;
   bool midEnemyProvacated;
 
-  invariant {
+  invariant() {
     if (isInitialized) {
       assert(vel.x <>= 0);
       assert(vel.y <>= 0);
@@ -372,6 +376,8 @@ public class PlayerSpec: TokenSpec!(PlayerState) {
       bulletHitWidth = 0.1f;
       shotMaxNum = 16;
       break;
+    default:
+      break;
     }
   }
 
@@ -489,6 +495,8 @@ public class PlayerSpec: TokenSpec!(PlayerState) {
           isFirstShot = true;
         }
         break;
+      default:
+        break;
       }
       if (input.button & PadState.Button.B) {
         speed += (BASE_SPEED * 1.2f - speed) * 0.33f;
@@ -542,6 +550,8 @@ public class PlayerSpec: TokenSpec!(PlayerState) {
         else
           tractorBeam.reduceLength();
         break;
+      default:
+        break;
       }
       tractorBeam.move();
       if (shotCnt > 0)
@@ -557,6 +567,8 @@ public class PlayerSpec: TokenSpec!(PlayerState) {
       case GameState.Mode.MODERN:
         if (pos.y > field.size.y)
           pos.y = field.size.y;
+        break;
+      default:
         break;
       }
       if (pos.y < -field.size.y)
@@ -770,7 +782,7 @@ public class ShotPool: ActorPool!(Shot) {
 
 public class Shot: Token!(ShotState, ShotSpec) {
  private:
-  
+
   public void setParent(Shot s) {
     spec.setParent(state, s);
   }
@@ -863,7 +875,7 @@ public class TractorBeam {
   int cnt;
   bool isExtending;
 
-  invariant {
+  invariant() {
     assert(length <>= 0);
   }
 
@@ -943,6 +955,8 @@ public class TractorBeam {
           shapes[c % 3].draw();
         else
           shapes[c % 3 + 3].draw();
+        break;
+      default:
         break;
       }
       c++;

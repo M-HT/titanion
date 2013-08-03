@@ -38,7 +38,7 @@ public class ArrayIterator(T) {
 alias ArrayIterator!(char[]) StringIterator;
 
 public class NoMoreItemsException: Exception {
-  public this(char[] msg) {
-    super(msg);
+  public this(const char[] msg) {
+    super(msg.idup);
   }
 }

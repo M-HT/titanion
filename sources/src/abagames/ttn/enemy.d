@@ -212,6 +212,8 @@ public class Enemy: Token!(EnemyState, EnemySpec) {
     case 1:
       state.phase = -100;
       break;
+    default:
+      break;
     }
     if (firstEnemy) {
       (cast(SmallEnemySpec) spec).init(state, firstEnemy.state);
@@ -290,7 +292,7 @@ public class Enemy: Token!(EnemyState, EnemySpec) {
     spec.drawTrails(state);
   }
 
-  public Vector pos() {
+  public override Vector pos() {
     return state.pos;
   }
 }
@@ -321,7 +323,7 @@ public class EnemyState: TokenState {
   bool isFirstEnemy;
   float anger;
 
-  invariant {
+  invariant() {
     if (isInitialized) {
       assert(baseBaseSpeed >= 0);
       assert(baseSpeed >= 0);
@@ -345,7 +347,7 @@ public class EnemyState: TokenState {
 
   public this() {
     super();
-    foreach (inout TurretState ts; turretStates)
+    foreach (ref TurretState ts; turretStates)
       ts = new TurretState;
     vel = new Vector;
     centerPos = new Vector;
@@ -355,7 +357,7 @@ public class EnemyState: TokenState {
     targetSize = new Vector;
     sizeVel = new Vector;
     trails = new Trail[TRAIL_NUM];
-    foreach (inout Trail t; trails)
+    foreach (ref Trail t; trails)
       t = new Trail;
   }
 
@@ -444,10 +446,10 @@ public class EnemySpec: TokenSpec!(EnemyState) {
   float rank = 0;
   bool capturable;
   int score;
-  char[] explosionSeName;
+  string explosionSeName;
   bool removeBullets;
 
-  invariant {
+  invariant() {
     assert(shield > 0);
     assert(rank >= 0);
     assert(turretWidth >= 0);
@@ -557,6 +559,8 @@ public class EnemySpec: TokenSpec!(EnemyState) {
           case 2:
             tx += turretWidth;
             break;
+          default:
+            break;
           }
           float turretDeg =
             atan2(field.normalizeX(-(player.pos.x - tx)), player.pos.y - ty);
@@ -575,6 +579,8 @@ public class EnemySpec: TokenSpec!(EnemyState) {
               turretDeg = -PI + PI / 4;
             break;
           case GameState.Mode.MODERN:
+            break;
+          default:
             break;
           }
           ts.update(tx, ty, turretDeg);
@@ -616,6 +622,8 @@ public class EnemySpec: TokenSpec!(EnemyState) {
         pos.x = player.pos.x + cx;
         pos.y = player.pos.y;
         deg = player.deg;
+        break;
+      default:
         break;
       }
       vel *= 0.9f;
@@ -696,6 +704,8 @@ public class EnemySpec: TokenSpec!(EnemyState) {
       case GameState.Mode.MODERN:
         targetSize.x *= 1.01f;
         targetSize.y *= 1.01f;
+        break;
+      default:
         break;
       }
       sizeVel.x = 0.3f;
@@ -801,6 +811,8 @@ public class EnemySpec: TokenSpec!(EnemyState) {
         case GameState.Mode.MODERN:
           cpw = 0.4f;
           break;
+        default:
+          break;
         }
         centerPos.x = rand.nextSignedFloat(field.size.x * cpw);
         centerPos.y = field.size.y * 2.0f;
@@ -838,7 +850,7 @@ public class EnemySpec: TokenSpec!(EnemyState) {
         angVel = baseAngVel * 2;
         phase = -50;
         break;
- 
+
       case -100:
         centerPos.x = field.size.x * 4.0f;
         if (rand.nextInt(2) == 0)
@@ -966,6 +978,8 @@ public class EnemySpec: TokenSpec!(EnemyState) {
       case 2:
         x += turretWidth;
         break;
+      default:
+        break;
       }
       p = field.calcCircularPos(x, es.pos.y);
       cd = field.calcCircularDeg(x);
@@ -988,7 +1002,7 @@ public class Trail {
   float deg;
   int cnt;
 
-  invariant {
+  invariant() {
     assert(pos.x <>= 0);
     assert(pos.y <>= 0);
     assert(deg <>= 0);
@@ -1015,7 +1029,7 @@ public class GhostEnemySpec: EnemySpec {
     this.shape = shape;
   }
 
-  public void draw(EnemyState es) {
+  public override void draw(EnemyState es) {
     with (es) {
       Vector3 p = field.calcCircularPos(pos);
       float cd = field.calcCircularDeg(pos.x);
@@ -1027,13 +1041,13 @@ public class GhostEnemySpec: EnemySpec {
   public override void set(EnemyState es) {}
   public override bool move(EnemyState es) { return true; }
   public override void destroyed(EnemyState es, float dd = 0) {}
-  public void setRank(float rank) {}
-  public void init(EnemyState es) {}
-  public bool gotoNextPhase(EnemyState es) { return false; }
-  public bool isInAttack(EnemyState es) { return false; }
-  protected int calcStandByTime(EnemyState es) { return 0; }
-  public bool isBeingCaptured(EnemyState es) { return true; }
-  public bool isCaptured(EnemyState es) { return true; }
+  public override void setRank(float rank) {}
+  public override void init(EnemyState es) {}
+  public override bool gotoNextPhase(EnemyState es) { return false; }
+  public override bool isInAttack(EnemyState es) { return false; }
+  protected override int calcStandByTime(EnemyState es) { return 0; }
+  public override bool isBeingCaptured(EnemyState es) { return true; }
+  public override bool isCaptured(EnemyState es) { return true; }
 }
 
 public class MiddleEnemySpec: EnemySpec {
@@ -1047,7 +1061,7 @@ public class MiddleEnemySpec: EnemySpec {
               GameState gameState) {
     super(field, bullets, player, particles, bonusParticles, enemies, stage,
           shape, trailShape, bulletSpec, counterBulletSpec, gameState);
-    foreach (inout TurretSpec ts; turretSpecs)
+    foreach (ref TurretSpec ts; turretSpecs)
       ts = new TurretSpec(field, bullets, player, enemies, particles,
                           stage, bulletSpec, gameState);
     switch (gameState.mode) {
@@ -1066,6 +1080,8 @@ public class MiddleEnemySpec: EnemySpec {
       capturable = true;
       removeBullets = true;
       break;
+    default:
+      break;
     }
     score = 100;
     explosionSeName = "explosion3.wav";
@@ -1079,7 +1095,7 @@ public class MiddleEnemySpec: EnemySpec {
     }
   }
 
-  public void setRank(float r) {
+  public override void setRank(float r) {
     rank = sqrt(r);
     float tr;
     switch (gameState.mode) {
@@ -1093,6 +1109,8 @@ public class MiddleEnemySpec: EnemySpec {
     case GameState.Mode.MODERN:
       rank = 1;
       tr = r * 15;
+      break;
+    default:
       break;
     }
     if (rank < 1.5f)
@@ -1155,6 +1173,8 @@ public class MiddleEnemySpec: EnemySpec {
         turretSpecs[2].nwayBaseDeg = -turretSpecs[1].nwayBaseDeg;
         turretWidth = 1.5f + rand.nextFloat(0.5f);
         turretNum = 3;
+        break;
+      default:
         break;
       }
     }
@@ -1252,6 +1272,8 @@ public class SmallEnemySpec: EnemySpec {
     case GameState.Mode.MODERN:
       shield = 2;
       break;
+    default:
+      break;
     }
     capturable = true;
     score = 10;
@@ -1276,7 +1298,7 @@ public class SmallEnemySpec: EnemySpec {
     }
   }
 
-  public void setRank(float r) {
+  public override void setRank(float r) {
     rank = sqrt(r * 0.5f);
     float tr;
     switch (gameState.mode) {
@@ -1290,6 +1312,8 @@ public class SmallEnemySpec: EnemySpec {
     case GameState.Mode.MODERN:
       rank = 1;
       tr = r;
+      break;
+    default:
       break;
     }
     if (rank < 1)
@@ -1343,6 +1367,8 @@ private:
         centerPos.y = standByPos.y;
         phase = 0;
         nextPhaseCnt = calcStandByTime(es);
+        break;
+      default:
         break;
       }
       nextPhaseCnt /= rank;
@@ -1409,6 +1435,8 @@ private:
         phase = 0;
         nextPhaseCnt = calcStandByTime(es);
         break;
+      default:
+        break;
       }
       nextPhaseCnt /= rank;
       phaseCnt = 0;
@@ -1430,7 +1458,7 @@ private:
       }
     }
   }
-  
+
   public override bool isInAttack(EnemyState es) {
     return (es.phase < -10 || es.phase == 1 || es.phase == 2 || es.phase == 3);
   }
@@ -1442,7 +1470,7 @@ public class TurretState: TokenState {
   int burstNum;
   int nwaySpeedAccelDir;
 
-  invariant {
+  invariant() {
     if (isInitialized) {
       assert(fireCnt <>= 0);
       assert(burstCnt <>= 0);
@@ -1488,7 +1516,7 @@ public class TurretSpec: TokenSpec!(TurretState) {
   bool _disabled;
   float minimumFireDist;
 
-  invariant {
+  invariant() {
     assert(interval > 0);
     assert(speed > 0);
     assert(speedAccel < 1 && speedAccel > -1);
@@ -1588,6 +1616,8 @@ public class TurretSpec: TokenSpec!(TurretState) {
       intervalMax = 120;
       burstInterval = 4 + rand.nextInt(4);
       break;
+    default:
+      break;
     }
     burstNum = cast(int) sqrt(br) + 1;
     nway = cast(int) sqrt(nr) + 1;
@@ -1620,6 +1650,8 @@ public class TurretSpec: TokenSpec!(TurretState) {
         speed = 0.04f;
       if (speed > 0.04f)
         speed = sqrt(speed * 25) / 25;
+      break;
+    default:
       break;
     }
     nwayAngle = (1.66f + rand.nextFloat(0.33f)) / (1 + nway * 0.7f) * 0.06f;
@@ -1675,10 +1707,14 @@ public class TurretSpec: TokenSpec!(TurretState) {
         br = (rank * 0.3f) * (1.0f + rand.nextSignedFloat(0.2f));
         ir = (rank * 0.3f) * (1.0f + rand.nextSignedFloat(0.2f));
         break;
+      default:
+        break;
       }
       nwayDegRatio = 1;
       intervalMax = 120;
       burstInterval = 4 + rand.nextInt(8);
+      break;
+    default:
       break;
     }
     bool acf = false;
@@ -1720,6 +1756,8 @@ public class TurretSpec: TokenSpec!(TurretState) {
       if (speed > 0.04f)
         speed = sqrt(speed * 25) / 25;
       break;
+    default:
+      break;
     }
     if (acf) {
       speedAccel = (speed * (0.2f + burstNum * 0.05f + rand.nextFloat(0.1f))) / (burstNum - 1);
@@ -1739,7 +1777,11 @@ public class TurretSpec: TokenSpec!(TurretState) {
     minimumFireDist = 5;
   }
 
-  public bool move(TurretState ts, float time = 1, float anger = 0) {
+  public override bool move(TurretState ts) {
+    return move(ts, 1);
+  }
+
+  public bool move(TurretState ts, float time, float anger = 0) {
     if (_disabled)
       return true;
     float itv = interval * ((1 - anger) * 0.99f + 0.01f);

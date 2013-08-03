@@ -6,6 +6,7 @@
 module abagames.ttn.title;
 
 private import std.string;
+private import std.conv;
 private import opengl;
 private import abagames.util.vector;
 private import abagames.util.sdl.pad;
@@ -162,7 +163,7 @@ public class Title {
     float y = 140;
     for (int i = 0; i < rn; i++) {
       if (cnt < 600) {
-      char[] rstr;
+      string rstr;
         switch (i) {
         case 0:
           rstr = "1ST";
@@ -174,7 +175,7 @@ public class Title {
           rstr = "3RD";
           break;
         default:
-          rstr = std.string.toString(i + 1) ~ "TH";
+          rstr = to!string(i + 1) ~ "TH";
           break;
         }
         if (i < 9)

@@ -211,6 +211,8 @@ public class Stage {
       case GameState.Mode.MODERN:
         rs *= 3;
         break;
+      default:
+        break;
       }
       rand.setSeed(rs);
       EnemySpec.setRandSeed(rs);
@@ -235,6 +237,8 @@ public class Stage {
       en = 24 + cast(int) ((50 + rand.nextInt(10)) * sqrt(rank) * 0.5);
       smallEnemyNum = 4 + rand.nextInt(2);
       middleEnemyAppInterval = 7 + rand.nextInt(3);
+      break;
+    default:
       break;
     }
     smallEnemyFormationNum = cast(int) (en / smallEnemyNum) + 1;
@@ -340,6 +344,8 @@ public class Stage {
           break;
         case 2:
           ses = cast(SmallEnemySpec) smallEnemy2Spec;
+          break;
+        default:
           break;
         }
         e.set(ses, x, field.size.y * Field.PIT_SIZE_Y_RATIO + i * dst, PI, sp);

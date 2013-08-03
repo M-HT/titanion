@@ -19,8 +19,8 @@ private import abagames.ttn.frame;
 public class Field {
  public:
   static const float PIT_SIZE_Y_RATIO = 12.0f;
- private:
   static const float CIRCLE_RADIUS = 64.0f;
+ private:
   static const float EYE_POS_DIST_RATIO = 1.25f;
   static const float X_EXPANSION_RATIO = 1.0f;
   static const float SIDEWALL_WIDTH = 145;

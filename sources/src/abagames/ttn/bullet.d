@@ -31,7 +31,7 @@ public class BulletPool: ActorPool!(Bullet) {
     BulletState.move();
   }
 
-  public void removeAround(inout int cnt, Vector pos,
+  public void removeAround(ref int cnt, Vector pos,
                            ParticlePool particles, ParticlePool bonusParticles,
                            Player player) {
     foreach (Bullet b; actors) {
@@ -190,6 +190,8 @@ public class BulletSpec: TokenSpec!(BulletState) {
       case GameState.Mode.BASIC:
       case GameState.Mode.MODERN:
         d = deg;
+        break;
+      default:
         break;
       }
       float cd = field.calcCircularDeg(pos.x);

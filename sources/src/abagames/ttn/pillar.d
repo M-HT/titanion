@@ -55,7 +55,7 @@ public class Pillar: Token!(PillarState, PillarSpec) {
   }
 
 
-  public int opCmp(Object o) {
+  public override int opCmp(Object o) {
     Pillar p = cast(Pillar) o;
     if (!p)
       return 0;

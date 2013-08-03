@@ -60,6 +60,8 @@ public class Particle: Token!(ParticleState, ParticleSpec) {
     case Shape.BONUS:
       spec = bonusParticleSpec;
       break;
+    default:
+      break;
     }
     this.spec = spec;
     super.set(x, y, deg, speed);
@@ -108,7 +110,7 @@ public class ParticleState: TokenState {
   float trgSize;
   int waitCnt;
 
-  invariant {
+  invariant() {
     if (isInitialized) {
       assert(pos.x <>= 0);
       assert(pos.y <>= 0);

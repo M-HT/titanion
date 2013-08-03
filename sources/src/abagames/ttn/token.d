@@ -22,7 +22,7 @@ public class Token(ST, SP): Actor {
   ST state;
   SP spec;
 
-  public void init(Object[] args) {
+  public override void init(Object[] args) {
     state = new ST;
   }
 
@@ -45,7 +45,7 @@ public class Token(ST, SP): Actor {
     _exists = true;
   }
 
-  public void move() {
+  public override void move() {
     if (!spec.move(state))
       remove();
   }
@@ -55,7 +55,7 @@ public class Token(ST, SP): Actor {
     spec.removed(state);
   }
 
-  public void draw() {
+  public override void draw() {
     spec.draw(state);
   }
 
@@ -74,7 +74,7 @@ public class TokenState {
   float deg;
   float speed;
 
-  invariant {
+  invariant() {
     if (isInitialized) {
       assert(pos.x <>= 0);
       assert(pos.y <>= 0);

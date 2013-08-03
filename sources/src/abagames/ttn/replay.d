@@ -5,7 +5,7 @@
  */
 module abagames.ttn.replay;
 
-private import std.stream;
+private import std.stdio;
 private import abagames.util.sdl.pad;
 private import abagames.util.sdl.recordableinput;
 
@@ -14,7 +14,7 @@ private import abagames.util.sdl.recordableinput;
  */
 public class ReplayData {
  public:
-  static const char[] DIR = "replay";
+  static string DIR = "replay";
   static const int VERSION_NUM = 30;
   InputRecord!(PadState) inputRecord;
   long seed;
@@ -23,29 +23,43 @@ public class ReplayData {
   bool stageRandomized;
  private:
 
-  public void save(char[] fileName) {
-    auto File fd = new File(DIR ~ "/" ~ fileName, FileMode.OutNew);
-    fd.write(VERSION_NUM);
-    fd.write(seed);
-    fd.write(score);
-    fd.write(mode);
-    fd.write(cast(byte) stageRandomized);
+  public void save(string fileName) {
+    int write_data_int[1];
+    long write_data_long[1];
+    byte write_data_byte[1];
+    scope File fd;
+    fd.open(DIR ~ "/" ~ fileName, "wb");
+    write_data_int[0] = VERSION_NUM;
+    fd.rawWrite(write_data_int);
+    write_data_long[0] = seed;
+    fd.rawWrite(write_data_long);
+    write_data_int[0] = score;
+    fd.rawWrite(write_data_int);
+    write_data_int[0] = mode;
+    fd.rawWrite(write_data_int);
+    write_data_byte[0] = cast(byte) stageRandomized;
+    fd.rawWrite(write_data_byte);
     inputRecord.save(fd);
     fd.close();
   }
 
-  public void load(char[] fileName) {
-    auto File fd = new File(DIR ~ "/" ~ fileName, FileMode.In);
-    int ver;
-    fd.read(ver);
-    if (ver != VERSION_NUM)
-      throw new Error("Wrong version num");
-    fd.read(seed);
-    fd.read(score);
-    fd.read(mode);
-    byte sr;
-    fd.read(sr);
-    stageRandomized = cast(bool) sr;
+  public void load(string fileName) {
+    int read_data_int[1];
+    long read_data_long[1];
+    byte read_data_byte[1];
+    scope File fd;
+    fd.open(DIR ~ "/" ~ fileName);
+    fd.rawRead(read_data_int);
+    if (read_data_int[0] != VERSION_NUM)
+      throw new Exception("Wrong version num");
+    fd.rawRead(read_data_long);
+    seed = read_data_long[0];
+    fd.rawRead(read_data_int);
+    score = read_data_int[0];
+    fd.rawRead(read_data_int);
+    mode = read_data_int[0];
+    fd.rawRead(read_data_byte);
+    stageRandomized = cast(bool) (read_data_byte[0]);
     inputRecord = new InputRecord!(PadState);
     inputRecord.load(fd);
     fd.close();

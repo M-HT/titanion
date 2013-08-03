@@ -6,6 +6,7 @@
 module abagames.util.logger;
 
 private import std.stdio;
+private import std.conv;
 private import std.string;
 
 /**
@@ -18,17 +19,17 @@ private import std.c.windows.windows;
 
 public class Logger {
 
-  public static void info(char[] msg, bool nline = true) {
+  public static void info(const char[] msg, bool nline = true) {
   }
 
   public static void info(double n, bool nline = true) {
   }
 
-  private static void putMessage(char[] msg) {
+  private static void putMessage(const char[] msg) {
     MessageBoxA(null, std.string.toStringz(msg), "Error", MB_OK | MB_ICONEXCLAMATION);
   }
 
-  public static void error(char[] msg) {
+  public static void error(const char[] msg) {
     putMessage("Error: " ~ msg);
   }
 
@@ -45,7 +46,7 @@ public class Logger {
 
 public class Logger {
 
-  public static void info(char[] msg, bool nline = true) {
+  public static void info(const char[] msg, bool nline = true) {
     if (nline)
       writefln(msg);
     else
@@ -54,12 +55,12 @@ public class Logger {
 
   public static void info(double n, bool nline = true) {
     if (nline)
-      writefln(std.string.toString(n));
+      writefln(to!string(n));
     else
-      writef(std.string.toString(n));
+      writef(to!string(n));
   }
 
-  public static void error(char[] msg) {
+  public static void error(const char[] msg) {
     writefln("Error: %s", msg);
   }
 
@@ -70,7 +71,7 @@ public class Logger {
   public static void error(Error e) {
     writefln("Error: %s", e.toString());
     if (e.next)
-      error(e.next);
+      error(cast(Error)e.next);
   }
 }
 

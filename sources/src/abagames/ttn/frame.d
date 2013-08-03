@@ -33,7 +33,7 @@ private import abagames.ttn.shape;
  */
 public class Frame: abagames.util.sdl.frame.Frame {
  private:
-  static const char[] LAST_REPLAY_FILE_NAME = "last.rpl";
+  static string LAST_REPLAY_FILE_NAME = "last.rpl";
   Pad pad;
   Screen screen;
   Field field;
@@ -235,7 +235,7 @@ public class Frame: abagames.util.sdl.frame.Frame {
       replayData.mode = gameState.mode;
       replayData.stageRandomized = stage.randomized;
       saveReplay(LAST_REPLAY_FILE_NAME);
-    } catch (Object o) {}
+    } catch (Exception o) {}
   }
 
   public void loadLastReplay() {
@@ -244,16 +244,16 @@ public class Frame: abagames.util.sdl.frame.Frame {
       gameState.lastGameScore = replayData.score;
       gameState.lastGameMode = replayData.mode;
       stage.randomized = replayData.stageRandomized;
-    } catch (Object o) {
+    } catch (Exception o) {
       resetReplay();
     }
   }
 
-  public void saveReplay(char[] fileName) {
+  public void saveReplay(string fileName) {
     replayData.save(fileName);
   }
 
-  public void loadReplay(char[] fileName) {
+  public void loadReplay(string fileName) {
     replayData = new ReplayData;
     replayData.load(fileName);
   }
@@ -269,7 +269,7 @@ public class GameState {
     CLASSIC, BASIC, MODERN,
   };
   static const int MODE_NUM = 3;
-  static const char[][] MODE_NAME = ["CLASSIC", " BASIC ", "MODERN"];
+  static string[] MODE_NAME = ["CLASSIC", " BASIC ", "MODERN"];
   static bool stageRandomized = false;
  private:
   static const enum Scene {
@@ -298,7 +298,7 @@ public class GameState {
   int extendScore;
   int proximityMultiplier, pmDispCnt;
 
-  invariant {
+  invariant() {
     assert(_multiplier >= 1.0f);
   }
 
@@ -339,6 +339,8 @@ public class GameState {
     case Mode.BASIC:
     case Mode.MODERN:
       extendScore = 1000000;
+      break;
+    default:
       break;
     }
     nextExtendScore = extendScore;
