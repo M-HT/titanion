@@ -6,7 +6,11 @@
 module abagames.ttn.bullet;
 
 private import std.math;
-private import opengl;
+version (USE_GLES) {
+  private import opengles;
+} else {
+  private import opengl;
+}
 private import abagames.util.vector;
 private import abagames.util.actor;
 private import abagames.util.math;
@@ -173,14 +177,42 @@ public class BulletSpec: TokenSpec!(BulletState) {
       if (waitCnt > 0)
         return;
       Vector3 p;
-      glBegin(GL_LINES);
-      Screen.setColor(0.1f, 0.4f, 0.4f, 0.5f);
-      p = field.calcCircularPos(tailPos);
-      Screen.glVertex(p);
-      Screen.setColor(0.2f * colorAlpha, 0.8f * colorAlpha, 0.8f * colorAlpha);
-      p = field.calcCircularPos(pos);
-      Screen.glVertex(p);
-      glEnd();
+      {
+        const int lineNumVertices = 2;
+        GLfloat[3*lineNumVertices] lineVertices;
+        GLfloat[4*lineNumVertices] lineColors;
+        float brightness = Screen.brightness;
+
+        lineColors[0*4 + 0] = 0.1f * brightness;
+        lineColors[0*4 + 1] = 0.4f * brightness;
+        lineColors[0*4 + 2] = 0.4f * brightness;
+        lineColors[0*4 + 3] = 0.5f;
+
+        lineColors[1*4 + 0] = 0.2f * colorAlpha * brightness;
+        lineColors[1*4 + 1] = 0.8f * colorAlpha * brightness;
+        lineColors[1*4 + 2] = 0.8f * colorAlpha * brightness;
+        lineColors[1*4 + 3] = 1;
+
+        p = field.calcCircularPos(tailPos);
+        lineVertices[0*3 + 0] = p.x;
+        lineVertices[0*3 + 1] = p.y;
+        lineVertices[0*3 + 2] = p.z;
+
+        p = field.calcCircularPos(pos);
+        lineVertices[1*3 + 0] = p.x;
+        lineVertices[1*3 + 1] = p.y;
+        lineVertices[1*3 + 2] = p.z;
+
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_COLOR_ARRAY);
+
+        glVertexPointer(3, GL_FLOAT, 0, cast(void *)(lineVertices.ptr));
+        glColorPointer(4, GL_FLOAT, 0, cast(void *)(lineColors.ptr));
+        glDrawArrays(GL_LINES, 0, lineNumVertices);
+
+        glDisableClientState(GL_COLOR_ARRAY);
+        glDisableClientState(GL_VERTEX_ARRAY);
+      }
       p = field.calcCircularPos(pos);
       float d;
       switch (gameState.mode) {

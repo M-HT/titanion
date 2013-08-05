@@ -5,7 +5,11 @@
  */
 module abagames.ttn.particle;
 
-private import opengl;
+version (USE_GLES) {
+  private import opengles;
+} else {
+  private import opengl;
+}
 private import std.math;
 private import abagames.util.vector;
 private import abagames.util.math;
@@ -295,14 +299,29 @@ public class LineParticleSpec: ParticleSpec {
   public override void draw(ParticleState ps) {
     with (ps) {
       Vector3 p;
-      glBegin(GL_LINES);
       float aa = a;// * calcNearPlayerAlpha(pos);
       Screen.setColor(r, g, b, aa);
-      p = field.calcCircularPos(pos);
-      Screen.glVertex(p);
-      p = field.calcCircularPos(tailPos);
-      Screen.glVertex(p);
-      glEnd();
+      {
+        const int lineNumVertices = 2;
+        GLfloat[3*lineNumVertices] lineVertices;
+
+        p = field.calcCircularPos(pos);
+        lineVertices[0*3 + 0] = p.x;
+        lineVertices[0*3 + 1] = p.y;
+        lineVertices[0*3 + 2] = p.z;
+
+        p = field.calcCircularPos(tailPos);
+        lineVertices[1*3 + 0] = p.x;
+        lineVertices[1*3 + 1] = p.y;
+        lineVertices[1*3 + 2] = p.z;
+
+        glEnableClientState(GL_VERTEX_ARRAY);
+
+        glVertexPointer(3, GL_FLOAT, 0, cast(void *)(lineVertices.ptr));
+        glDrawArrays(GL_LINES, 0, lineNumVertices);
+
+        glDisableClientState(GL_VERTEX_ARRAY);
+      }
     }
   }
 }
@@ -343,30 +362,45 @@ public class QuadParticleSpec: ParticleSpec {
       Vector3 p;
       float sz = size * 0.5f;
       float aa = a * calcNearPlayerAlpha(pos);
-      Screen.setColor(r, g, b, aa);
-      glBegin(GL_QUADS);
-      p = field.calcCircularPos(pos.x - sz, pos.y - sz);
-      Screen.glVertex(p);
-      p = field.calcCircularPos(pos.x + sz, pos.y - sz);
-      Screen.glVertex(p);
-      p = field.calcCircularPos(pos.x + sz, pos.y + sz);
-      Screen.glVertex(p);
-      p = field.calcCircularPos(pos.x - sz, pos.y + sz);
-      Screen.glVertex(p);
-      glEnd();
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-      Screen.setColor(0, 0, 0, aa * 0.66f);
-      glBegin(GL_LINE_LOOP);
-      p = field.calcCircularPos(pos.x - sz, pos.y - sz);
-      Screen.glVertex(p);
-      p = field.calcCircularPos(pos.x + sz, pos.y - sz);
-      Screen.glVertex(p);
-      p = field.calcCircularPos(pos.x + sz, pos.y + sz);
-      Screen.glVertex(p);
-      p = field.calcCircularPos(pos.x - sz, pos.y + sz);
-      Screen.glVertex(p);
-      glEnd();
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+      {
+        const int quadNumVertices = 4;
+        GLfloat[3*quadNumVertices] quadVertices;
+
+        p = field.calcCircularPos(pos.x - sz, pos.y - sz);
+        quadVertices[0*3 + 0] = p.x;
+        quadVertices[0*3 + 1] = p.y;
+        quadVertices[0*3 + 2] = p.z;
+
+        p = field.calcCircularPos(pos.x + sz, pos.y - sz);
+        quadVertices[1*3 + 0] = p.x;
+        quadVertices[1*3 + 1] = p.y;
+        quadVertices[1*3 + 2] = p.z;
+
+        p = field.calcCircularPos(pos.x + sz, pos.y + sz);
+        quadVertices[2*3 + 0] = p.x;
+        quadVertices[2*3 + 1] = p.y;
+        quadVertices[2*3 + 2] = p.z;
+
+        p = field.calcCircularPos(pos.x - sz, pos.y + sz);
+        quadVertices[3*3 + 0] = p.x;
+        quadVertices[3*3 + 1] = p.y;
+        quadVertices[3*3 + 2] = p.z;
+
+        glEnableClientState(GL_VERTEX_ARRAY);
+
+        glVertexPointer(3, GL_FLOAT, 0, cast(void *)(quadVertices.ptr));
+
+        Screen.setColor(r, g, b, aa);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, quadNumVertices);
+
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        Screen.setColor(0, 0, 0, aa * 0.66f);
+        glDrawArrays(GL_LINE_LOOP, 0, quadNumVertices);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+
+        glDisableClientState(GL_VERTEX_ARRAY);
+      }
+
     }
   }
 }

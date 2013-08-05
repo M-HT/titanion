@@ -7,7 +7,11 @@ module abagames.ttn.title;
 
 private import std.string;
 private import std.conv;
-private import opengl;
+version (USE_GLES) {
+  private import opengles;
+} else {
+  private import opengl;
+}
 private import abagames.util.vector;
 private import abagames.util.sdl.pad;
 private import abagames.util.sdl.texture;
@@ -124,16 +128,29 @@ public class Title {
   }
 
   private void drawBoard(float x, float y, float w, float h) {
-    glBegin(GL_TRIANGLE_FAN);
-    glTexCoord2f(0, 0);
-    glVertex3f(x, y, 0);
-    glTexCoord2f(1, 0);
-    glVertex3f(x + w, y, 0);
-    glTexCoord2f(1, 1);
-    glVertex3f(x + w, y + h, 0);
-    glTexCoord2f(0, 1);
-    glVertex3f(x, y + h, 0);
-    glEnd();
+    static const int titleNumVertices = 4;
+    const GLfloat[3*titleNumVertices] titleVertices = [
+      x, y, 0,
+      x + w, y, 0,
+      x + w, y + h, 0,
+      x, y + h, 0
+    ];
+    static const GLfloat[2*titleNumVertices] titleTexCoords = [
+      0, 0,
+      1, 0,
+      1, 1,
+      0, 1
+    ];
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+    glVertexPointer(3, GL_FLOAT, 0, cast(void *)(titleVertices.ptr));
+    glTexCoordPointer(2, GL_FLOAT, 0, cast(void *)(titleTexCoords.ptr));
+    glDrawArrays(GL_TRIANGLE_FAN, 0, titleNumVertices);
+
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    glDisableClientState(GL_VERTEX_ARRAY);
   }
 
   private void drawTriangle(float x, float y, float d) {
@@ -141,18 +158,26 @@ public class Title {
     glTranslatef(x, y, 0);
     glRotatef(d, 0, 0, 1);
     glScalef(5, 5, 1);
-    glBegin(GL_TRIANGLE_FAN);
-    Screen.setColor(1, 1, 1, 0.5f);
-    glVertex3f(0, 1.7f, 0);
-    glVertex3f(1, 0, 0);
-    glVertex3f(-1, 0, 0);
-    glEnd();
-    glBegin(GL_LINE_LOOP);
-    Screen.setColor(1, 1, 1, 1);
-    glVertex3f(0, 1.7f, 0);
-    glVertex3f(1, 0, 0);
-    glVertex3f(-1, 0, 0);
-    glEnd();
+    {
+      const int triangleNumVertices = 3;
+      const GLfloat[3*triangleNumVertices] triangleVertices = [
+        0, 1.7f, 0,
+        1, 0, 0,
+        -1, 0, 0
+      ];
+
+      glEnableClientState(GL_VERTEX_ARRAY);
+
+      glVertexPointer(3, GL_FLOAT, 0, cast(void *)(triangleVertices.ptr));
+
+      Screen.setColor(1, 1, 1, 0.5f);
+      glDrawArrays(GL_TRIANGLE_FAN, 0, triangleNumVertices);
+
+      Screen.setColor(1, 1, 1, 1);
+      glDrawArrays(GL_LINE_LOOP, 0, triangleNumVertices);
+
+      glDisableClientState(GL_VERTEX_ARRAY);
+    }
     glPopMatrix();
   }
 

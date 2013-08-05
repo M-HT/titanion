@@ -7,7 +7,11 @@ module abagames.ttn.frame;
 
 private import std.math;
 private import SDL;
-private import opengl;
+version (USE_GLES) {
+  private import opengles;
+} else {
+  private import opengl;
+}
 private import abagames.util.rand;
 private import abagames.util.vector;
 private import abagames.util.sdl.frame;

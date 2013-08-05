@@ -7,8 +7,12 @@ module abagames.ttn.screen;
 
 private import std.string;
 private import SDL;
-private import opengl;
-//private import openglu;
+version (USE_GLES) {
+  private import opengles;
+} else {
+  private import opengl;
+  //private import openglu;
+}
 private import abagames.util.sdl.screen3d;
 private import abagames.ttn.field;
 

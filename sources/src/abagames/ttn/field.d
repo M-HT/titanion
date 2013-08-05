@@ -6,8 +6,14 @@
 module abagames.ttn.field;
 
 private import std.math;
-private import opengl;
-private import openglu;
+version (USE_GLES) {
+  private import opengles;
+  private import opengles_glu;
+  alias glOrthof glOrtho;
+} else {
+  private import opengl;
+  private import openglu;
+}
 private import abagames.util.vector;
 private import abagames.util.math;
 private import abagames.ttn.screen;
@@ -191,27 +197,36 @@ public class Field {
   }
 
   private void drawSidewall() {
+    static const GLfloat[3*12] sidewallVertices = [
+      0, 0, 0,
+      SIDEWALL_WIDTH, 0, 0,
+      SIDEWALL_WIDTH, 480, 0,
+      0, 480, 0,
+
+      640, 0, 0,
+      640 - SIDEWALL_WIDTH, 0, 0,
+      640 - SIDEWALL_WIDTH, 480, 0,
+      640, 480, 0,
+
+      SIDEWALL_WIDTH, 0, 0,
+      SIDEWALL_WIDTH, 480, 0,
+      640 - SIDEWALL_WIDTH, 0, 0,
+      640 - SIDEWALL_WIDTH, 480, 0
+    ];
+
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glVertexPointer(3, GL_FLOAT, 0, cast(void *)(sidewallVertices.ptr));
+
     Screen.setColor(0.25f, 0.25f, 0.25f, 0.5f);
-    glBegin(GL_TRIANGLE_FAN);
-    glVertex3f(0, 0, 0);
-    glVertex3f(SIDEWALL_WIDTH, 0, 0);
-    glVertex3f(SIDEWALL_WIDTH, 480, 0);
-    glVertex3f(0, 480, 0);
-    glEnd();
-    glBegin(GL_TRIANGLE_FAN);
-    glVertex3f(640, 0, 0);
-    glVertex3f(640 - SIDEWALL_WIDTH, 0, 0);
-    glVertex3f(640 - SIDEWALL_WIDTH, 480, 0);
-    glVertex3f(640, 480, 0);
-    glEnd();
+    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+
+    glDrawArrays(GL_TRIANGLE_FAN, 4, 4);
+
     Screen.setColor(1.0f, 1.0f, 1.0f, 0.8f);
-    glBegin(GL_LINES);
-    glVertex3f(SIDEWALL_WIDTH, 0, 0);
-    glVertex3f(SIDEWALL_WIDTH, 480, 0);
-    glVertex3f(640 - SIDEWALL_WIDTH, 0, 0);
-    glVertex3f(640 - SIDEWALL_WIDTH, 480, 0);
-    glEnd();
+    glDrawArrays(GL_LINES, 8, 4);
+
+    glDisableClientState(GL_VERTEX_ARRAY);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
   }
 
@@ -234,6 +249,17 @@ public class Field {
   }
 
   private void drawTorusShape(float d1s) {
+    const int quadNumVertices = 4;
+    GLfloat[4*quadNumVertices] quadColors;
+    float brightness = Screen.brightness;
+
+    foreach (i; 0..quadNumVertices) {
+      quadColors[4*i + 0] = 0.3f * brightness;
+      quadColors[4*i + 1] = 0.3f * brightness;
+      quadColors[4*i + 2] = 0.3f * brightness;
+      quadColors[4*i + 3] = (i == (quadNumVertices - 1))?0.2f:0.8f;
+    }
+
     Vector3 cp = new Vector3;
     cp.y = 0;
     Vector3 ringOfs = new Vector3;
@@ -241,30 +267,44 @@ public class Field {
     float ringRad;
     float d1;
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glBegin(GL_QUADS);
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY);
+    glColorPointer(4, GL_FLOAT, 0, cast(void *)(quadColors.ptr));
     ringRad = CIRCLE_RADIUS * 0.3f;
     d1 = d1s;
     for (int i = 0; i < 16; i++, d1 += PI * 2 / 32) {
       float d2 = cnt * 0.003f;
       for (int j = 0; j < 16; j++, d2 += PI * 2 / 16) {
+        GLfloat[3*quadNumVertices] quadVertices;
         cp.x = sin(d1) * torusRad;
         cp.z = cos(d1) * torusRad;
         createRingOffset(ringOfs, cp, ringRad, d1, d2);
-        Screen.setColor(0.3f, 0.3f, 0.3f, 0.8f);
-        Screen.glVertex(ringOfs);
+        quadVertices[0*3 + 0] = ringOfs.x;
+        quadVertices[0*3 + 1] = ringOfs.y;
+        quadVertices[0*3 + 2] = ringOfs.z;
         createRingOffset(ringOfs, cp, ringRad, d1, d2 + PI * 2 / 16);
-        Screen.glVertex(ringOfs);
+        quadVertices[1*3 + 0] = ringOfs.x;
+        quadVertices[1*3 + 1] = ringOfs.y;
+        quadVertices[1*3 + 2] = ringOfs.z;
         cp.x = sin(d1 + PI * 2 / 32) * torusRad;
         cp.z = cos(d1 + PI * 2 / 32) * torusRad;
         createRingOffset(ringOfs, cp, ringRad, d1 + PI * 2 / 32, d2 + PI * 2 / 16);
-        Screen.glVertex(ringOfs);
+        quadVertices[2*3 + 0] = ringOfs.x;
+        quadVertices[2*3 + 1] = ringOfs.y;
+        quadVertices[2*3 + 2] = ringOfs.z;
         createRingOffset(ringOfs, cp, ringRad, d1 + PI * 2 / 32, d2);
-        Screen.setColor(0.3f, 0.3f, 0.3f, 0.2f);
-        Screen.glVertex(ringOfs);
+        quadVertices[3*3 + 0] = ringOfs.x;
+        quadVertices[3*3 + 1] = ringOfs.y;
+        quadVertices[3*3 + 2] = ringOfs.z;
+
+        glVertexPointer(3, GL_FLOAT, 0, cast(void *)(quadVertices.ptr));
+        glDrawArrays(GL_TRIANGLE_FAN, 0, quadNumVertices);
       }
     }
-    glEnd();
-    glBegin(GL_LINE_STRIP);
+    glDisableClientState(GL_COLOR_ARRAY);
+    const int lineNumVertices = 16*16*4;
+    GLfloat[3*lineNumVertices] lineVertices;
+    int lineIdx = 0;
     ringRad = CIRCLE_RADIUS * 0.3f;
     Screen.setColor(0.1f, 0.1f, 0.1f);
     d1 = d1s;
@@ -274,18 +314,32 @@ public class Field {
         cp.x = sin(d1 + PI * 2 / 32 * 0.1f) * torusRad;
         cp.z = cos(d1 + PI * 2 / 32 * 0.1f) * torusRad;
         createRingOffset(ringOfs, cp, ringRad, d1 + PI * 2 / 32 * 0.1f, d2 + PI * 2 / 16 * 0.1f);
-        Screen.glVertex(ringOfs);
+        lineVertices[lineIdx + 0] = ringOfs.x;
+        lineVertices[lineIdx + 1] = ringOfs.y;
+        lineVertices[lineIdx + 2] = ringOfs.z;
+        lineIdx += 3;
         createRingOffset(ringOfs, cp, ringRad, d1 + PI * 2 / 32 * 0.1f, d2 + PI * 2 / 16 * 0.9f);
-        Screen.glVertex(ringOfs);
+        lineVertices[lineIdx + 0] = ringOfs.x;
+        lineVertices[lineIdx + 1] = ringOfs.y;
+        lineVertices[lineIdx + 2] = ringOfs.z;
+        lineIdx += 3;
         cp.x = sin(d1 + PI * 2 / 32 * 0.9f) * torusRad;
         cp.z = cos(d1 + PI * 2 / 32 * 0.9f) * torusRad;
         createRingOffset(ringOfs, cp, ringRad, d1 + PI * 2 / 32 * 0.9f, d2 + PI * 2 / 32 * 0.1f);
-        Screen.glVertex(ringOfs);
+        lineVertices[lineIdx + 0] = ringOfs.x;
+        lineVertices[lineIdx + 1] = ringOfs.y;
+        lineVertices[lineIdx + 2] = ringOfs.z;
+        lineIdx += 3;
         createRingOffset(ringOfs, cp, ringRad, d1 + PI * 2 / 32 * 0.9f, d2 + PI * 2 / 16 * 0.9f);
-        Screen.glVertex(ringOfs);
+        lineVertices[lineIdx + 0] = ringOfs.x;
+        lineVertices[lineIdx + 1] = ringOfs.y;
+        lineVertices[lineIdx + 2] = ringOfs.z;
+        lineIdx += 3;
       }
     }
-    glEnd();
+    glVertexPointer(3, GL_FLOAT, 0, cast(void *)(lineVertices.ptr));
+    glDrawArrays(GL_LINE_STRIP, 0, lineNumVertices);
+    glDisableClientState(GL_VERTEX_ARRAY);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
   }
 

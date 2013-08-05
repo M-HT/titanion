@@ -6,7 +6,11 @@
 module abagames.ttn.player;
 
 private import std.math;
-private import opengl;
+version (USE_GLES) {
+  private import opengles;
+} else {
+  private import opengl;
+}
 private import abagames.util.vector;
 private import abagames.util.rand;
 private import abagames.util.math;
@@ -730,12 +734,22 @@ public class PlayerSpec: TokenSpec!(PlayerState) {
   public void drawState(PlayerState ps) {
     with (ps) {
       Screen.setColor(1, 1, 1, 0.5f);
-      glBegin(GL_TRIANGLE_FAN);
-      glVertex3f(15, 400, 0);
-      glVertex3f(15 + captureBeamEnergy * 100, 400, 0);
-      glVertex3f(25 + captureBeamEnergy * 100, 420, 0);
-      glVertex3f(25, 420, 0);
-      glEnd();
+      {
+        const int quadNumVertices = 4;
+        const GLfloat[3*quadNumVertices] quadVertices = [
+          15, 400, 0,
+          15 + captureBeamEnergy * 100, 400, 0,
+          25 + captureBeamEnergy * 100, 420, 0,
+          25, 420, 0
+        ];
+
+        glEnableClientState(GL_VERTEX_ARRAY);
+
+        glVertexPointer(3, GL_FLOAT, 0, cast(void *)(quadVertices.ptr));
+        glDrawArrays(GL_TRIANGLE_FAN, 0, quadNumVertices);
+
+        glDisableClientState(GL_VERTEX_ARRAY);
+      }
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       float a;
       if (captureBeamEnergy < 1) {
@@ -748,12 +762,22 @@ public class PlayerSpec: TokenSpec!(PlayerState) {
           a = 1 - cast(float) (c - 30) / 30;
       }
       Screen.setColor(1, 1, 1, a);
-      glBegin(GL_LINE_LOOP);
-      glVertex3f(15, 400, 0);
-      glVertex3f(115, 400, 0);
-      glVertex3f(125, 420, 0);
-      glVertex3f(25, 420, 0);
-      glEnd();
+      {
+        const int quadNumVertices = 4;
+        const GLfloat[3*quadNumVertices] quadVertices = [
+          15, 400, 0,
+          115, 400, 0,
+          125, 420, 0,
+          25, 420, 0
+        ];
+
+        glEnableClientState(GL_VERTEX_ARRAY);
+
+        glVertexPointer(3, GL_FLOAT, 0, cast(void *)(quadVertices.ptr));
+        glDrawArrays(GL_LINE_LOOP, 0, quadNumVertices);
+
+        glDisableClientState(GL_VERTEX_ARRAY);
+      }
       glBlendFunc(GL_SRC_ALPHA, GL_ONE);
       if (captureBeamEnergy >= 1)
         Letter.drawString("READY", 50, 390, 4);
