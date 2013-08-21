@@ -57,7 +57,7 @@ public class Screen: Screen3D {
     else if (lw > 4)
       lw = 4;
     glLineWidth(lw);
-    glViewport(0, 0, width, height);
+    glViewport(startx, starty, width, height);
     if (field)
       field.setLookAt();
   }

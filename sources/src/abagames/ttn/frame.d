@@ -200,7 +200,41 @@ public class Frame: abagames.util.sdl.frame.Frame {
     }
     field.setLookAt();
     if (gameState.isInGame || replayData) {
-      pillars.drawOutside();
+      version (PANDORA) {
+        // on Pandora, drawing outside pillars make the game unplayable, so
+        // I just draw a colored background (the same color as outside pillars)
+        // and the pillars wireframes
+        {
+          static const int backgroundNumVertices = 4;
+          static const GLfloat[3*backgroundNumVertices] backgroundVertices = [
+            -3*32, -3*24, 0,
+             3*32, -3*24, 0,
+             3*32,  3*24, 0,
+            -3*32,  3*24, 0
+          ];
+
+          glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+          glEnableClientState(GL_VERTEX_ARRAY);
+          glVertexPointer(3, GL_FLOAT, 0, cast(void *)(backgroundVertices.ptr));
+
+          Screen.setColor(0.2f, 0.2f, 0.3f);
+          glDrawArrays(GL_TRIANGLE_FAN, 0, backgroundNumVertices);
+
+          glDisableClientState(GL_VERTEX_ARRAY);
+          glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+        }
+
+        glCullFace(GL_FRONT_AND_BACK);
+        glEnable(GL_CULL_FACE);
+
+        pillars.drawOutside();
+
+        glDisable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+      } else {
+        pillars.drawOutside();
+      }
+
       field.drawBack();
       enemies.drawPillarBack();
       pillars.drawCenter();
@@ -219,7 +253,10 @@ public class Frame: abagames.util.sdl.frame.Frame {
       field.resetLookAt();
       gameState.drawLeft();
     } else {
-      pillars.drawOutside();
+      version (PANDORA) {
+      } else {
+        pillars.drawOutside();
+      }
       field.drawBack();
       field.drawFront();
       field.beginDrawingFront();
