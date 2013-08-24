@@ -131,7 +131,7 @@ public class DisplayListShape: Shape {
   public void draw(Vector3 pos, float cd, float deg) {
     glPushMatrix();
     Screen.glTranslate(pos);
-    glRotatef(cd * 180 / PI, 0, 1, 0);
+    glRotatef(cd * cast(float)(180 / PI), 0, 1, 0);
     Screen.glRotate(deg);
     drawShape();
     glPopMatrix();
@@ -164,8 +164,8 @@ public class PyramidShape: DisplayListShape {
       pRotateDegC = 1;
       pRotateDegS = 0;
     } else {
-      pRotateDegC = cos(deg * std.math.PI / 180);
-      pRotateDegS = sin(deg * std.math.PI / 180);
+      pRotateDegC = cos(deg * cast(float)(std.math.PI / 180));
+      pRotateDegS = sin(deg * cast(float)(std.math.PI / 180));
     }
   }
 
@@ -412,7 +412,7 @@ public class BulletShapeBase: DisplayListShape {
   public void draw(Vector3 pos, float cd, float deg, float rd) {
     glPushMatrix();
     Screen.glTranslate(pos);
-    glRotatef(cd * 180 / PI, 0, 1, 0);
+    glRotatef(cd * cast(float)(180 / PI), 0, 1, 0);
     Screen.glRotate(deg);
     glRotatef(rd, 0, 1, 0);
     drawShape();
@@ -566,7 +566,7 @@ public class RollBulletShapeBase: BulletShapeBase {
   public override void draw(Vector3 pos, float cd, float deg, float rd) {
     glPushMatrix();
     Screen.glTranslate(pos);
-    glRotatef(cd * 180 / PI, 0, 1, 0);
+    glRotatef(cd * cast(float)(180 / PI), 0, 1, 0);
     glRotatef(rd, 0, 0, 1);
     drawShape();
     glPopMatrix();
@@ -633,7 +633,7 @@ public class EnemyShape: PyramidShape {
   public void draw(Vector3 pos, float cd, float deg, float cnt, float sx, float sy) {
     glPushMatrix();
     Screen.glTranslate(pos);
-    glRotatef(cd * 180 / PI, 0, 1, 0);
+    glRotatef(cd * cast(float)(180 / PI), 0, 1, 0);
     Screen.glRotate(deg);
     glScalef(sx, sy, 1);
     glRotatef(cnt * 3.0f, 0, 1, 0);
@@ -853,20 +853,24 @@ public class PillarShape: DisplayListShape {
     for (int i = 0; i < 8; i++) {
       prepareAddPart(GL_TRIANGLE_FAN);
       float d = PI * 2 * i / 8;
-      prepareAddVertex(sin(d) * Field.CIRCLE_RADIUS * RADIUS_RATIO,
+      const float dSin1 = sin(d);
+      const float dCos1 = cos(d);
+      prepareAddVertex(dSin1 * Field.CIRCLE_RADIUS * RADIUS_RATIO,
                  TICKNESS,
-                 cos(d) * Field.CIRCLE_RADIUS * RADIUS_RATIO);
+                 dCos1 * Field.CIRCLE_RADIUS * RADIUS_RATIO);
       d += PI * 2 / 8;
-      prepareAddVertex(sin(d) * Field.CIRCLE_RADIUS * RADIUS_RATIO,
+      const float dSin2 = sin(d);
+      const float dCos2 = cos(d);
+      prepareAddVertex(dSin2 * Field.CIRCLE_RADIUS * RADIUS_RATIO,
                  TICKNESS,
-                 cos(d) * Field.CIRCLE_RADIUS * RADIUS_RATIO);
-      prepareAddVertex(sin(d) * Field.CIRCLE_RADIUS * RADIUS_RATIO,
+                 dCos2 * Field.CIRCLE_RADIUS * RADIUS_RATIO);
+      prepareAddVertex(dSin2 * Field.CIRCLE_RADIUS * RADIUS_RATIO,
                  -TICKNESS,
-                 cos(d) * Field.CIRCLE_RADIUS * RADIUS_RATIO);
+                 dCos2 * Field.CIRCLE_RADIUS * RADIUS_RATIO);
       d -= PI * 2 / 8;
-      prepareAddVertex(sin(d) * Field.CIRCLE_RADIUS * RADIUS_RATIO,
+      prepareAddVertex(dSin1 * Field.CIRCLE_RADIUS * RADIUS_RATIO,
                  -TICKNESS,
-                 cos(d) * Field.CIRCLE_RADIUS * RADIUS_RATIO);
+                 dCos1 * Field.CIRCLE_RADIUS * RADIUS_RATIO);
     }
 
     if (!outside) {
@@ -874,43 +878,51 @@ public class PillarShape: DisplayListShape {
       prepareAddPart(GL_TRIANGLES);
       for (int i = 0; i < 8; i++) {
         float d = PI * 2 * i / 8;
+        const float dSin1 = sin(d);
+        const float dCos1 = cos(d);
         prepareAddVertex(0, TICKNESS, 0);
-        prepareAddVertex(sin(d) * Field.CIRCLE_RADIUS * RADIUS_RATIO,
+        prepareAddVertex(dSin1 * Field.CIRCLE_RADIUS * RADIUS_RATIO,
                    TICKNESS,
-                   cos(d) * Field.CIRCLE_RADIUS * RADIUS_RATIO);
+                   dCos1 * Field.CIRCLE_RADIUS * RADIUS_RATIO);
         d += PI * 2 / 8;
-        prepareAddVertex(sin(d) * Field.CIRCLE_RADIUS * RADIUS_RATIO,
+        const float dSin2 = sin(d);
+        const float dCos2 = cos(d);
+        prepareAddVertex(dSin2 * Field.CIRCLE_RADIUS * RADIUS_RATIO,
                    TICKNESS,
-                   cos(d) * Field.CIRCLE_RADIUS * RADIUS_RATIO);
+                   dCos2 * Field.CIRCLE_RADIUS * RADIUS_RATIO);
         d -= PI * 2 / 8;
         prepareAddVertex(0, -TICKNESS, 0);
-        prepareAddVertex(sin(d) * Field.CIRCLE_RADIUS * RADIUS_RATIO,
+        prepareAddVertex(dSin1 * Field.CIRCLE_RADIUS * RADIUS_RATIO,
                    -TICKNESS,
-                   cos(d) * Field.CIRCLE_RADIUS * RADIUS_RATIO);
+                   dCos1 * Field.CIRCLE_RADIUS * RADIUS_RATIO);
         d += PI * 2 / 8;
-        prepareAddVertex(sin(d) * Field.CIRCLE_RADIUS * RADIUS_RATIO,
+        prepareAddVertex(dSin2 * Field.CIRCLE_RADIUS * RADIUS_RATIO,
                    -TICKNESS,
-                   cos(d) * Field.CIRCLE_RADIUS * RADIUS_RATIO);
+                   dCos2 * Field.CIRCLE_RADIUS * RADIUS_RATIO);
       }
     }
     prepareSetColor(0.1f, 0.1f, 0.1f);
     for (int i = 0; i < 8; i++) {
       float d = PI * 2 * i / 8;
+      const float dSin1 = sin(d);
+      const float dCos1 = cos(d);
       prepareAddPart(GL_LINE_STRIP);
-      prepareAddVertex(sin(d) * Field.CIRCLE_RADIUS * RADIUS_RATIO,
+      prepareAddVertex(dSin1 * Field.CIRCLE_RADIUS * RADIUS_RATIO,
                  TICKNESS,
-                 cos(d) * Field.CIRCLE_RADIUS * RADIUS_RATIO);
+                 dCos1 * Field.CIRCLE_RADIUS * RADIUS_RATIO);
       d += PI * 2 / 8;
-      prepareAddVertex(sin(d) * Field.CIRCLE_RADIUS * RADIUS_RATIO,
+      const float dSin2 = sin(d);
+      const float dCos2 = cos(d);
+      prepareAddVertex(dSin2 * Field.CIRCLE_RADIUS * RADIUS_RATIO,
                  TICKNESS,
-                 cos(d) * Field.CIRCLE_RADIUS * RADIUS_RATIO);
-      prepareAddVertex(sin(d) * Field.CIRCLE_RADIUS * RADIUS_RATIO,
+                 dCos2 * Field.CIRCLE_RADIUS * RADIUS_RATIO);
+      prepareAddVertex(dSin2 * Field.CIRCLE_RADIUS * RADIUS_RATIO,
                  -TICKNESS,
-                 cos(d) * Field.CIRCLE_RADIUS * RADIUS_RATIO);
+                 dCos2 * Field.CIRCLE_RADIUS * RADIUS_RATIO);
       d -= PI * 2 / 8;
-      prepareAddVertex(sin(d) * Field.CIRCLE_RADIUS * RADIUS_RATIO,
+      prepareAddVertex(dSin1 * Field.CIRCLE_RADIUS * RADIUS_RATIO,
                  -TICKNESS,
-                 cos(d) * Field.CIRCLE_RADIUS * RADIUS_RATIO);
+                 dCos1 * Field.CIRCLE_RADIUS * RADIUS_RATIO);
     }
     prepareEndBlend();
   }
@@ -918,7 +930,7 @@ public class PillarShape: DisplayListShape {
   public void draw(float y, float deg) {
     glPushMatrix();
     glTranslatef(0, y, 0);
-    glRotatef(deg * 180 / PI, 0, 1, 0);
+    glRotatef(deg * cast(float)(180 / PI), 0, 1, 0);
     drawShape();
     glPopMatrix();
   }

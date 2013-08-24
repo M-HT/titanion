@@ -157,6 +157,8 @@ public class Letter {
       break;
     }
     ld += od;
+    const float ldSin = sin(ld * cast(float)(PI / 180));
+    const float ldCos = cos(ld * cast(float)(PI / 180));
     foreach (char c; str) {
       if (c != ' ') {
         idx = convertCharToInt(c);
@@ -196,8 +198,8 @@ public class Letter {
           break;
         }
       } else {
-        x += cos(ld * PI / 180) * s * LETTER_WIDTH;
-        y += sin(ld * PI / 180) * s * LETTER_WIDTH;
+        x += ldCos * s * LETTER_WIDTH;
+        y += ldSin * s * LETTER_WIDTH;
       }
     }
   }
@@ -330,8 +332,8 @@ public class Letter {
     if (deg != 0) {
       // rotate part
 
-      const float cdeg = cos(deg * std.math.PI / 180);
-      const float sdeg = sin(deg * std.math.PI / 180);
+      const float cdeg = cos(deg * cast(float)(std.math.PI / 180));
+      const float sdeg = sin(deg * cast(float)(std.math.PI / 180));
 
       foreach (i; 0..partNumVertices) {
         const float px = partVertices[3*i + 0];

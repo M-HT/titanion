@@ -39,11 +39,13 @@ public class EnemyPool: ActorPool!(Enemy) {
     float dst = 99999;
     Enemy ne = null;
     foreach (Enemy e; actors) {
-      if (e.exists && !e.isBeingCaptured)
-        if (_field.calcCircularDist(e.pos, p) < dst) {
-          dst = _field.calcCircularDist(e.pos, p);
+      if (e.exists && !e.isBeingCaptured) {
+        float enemyDst = _field.calcCircularDist(e.pos, p);
+        if (enemyDst < dst) {
+          dst = enemyDst;
           ne = e;
         }
+      }
     }
     return ne;
   }
@@ -53,11 +55,13 @@ public class EnemyPool: ActorPool!(Enemy) {
     Enemy ne = null;
     foreach (Enemy e; actors) {
       if (e.exists && !e.isBeingCaptured)
-        if (cast(MiddleEnemySpec) e.spec)
-          if (_field.calcCircularDist(e.pos, p) < dst) {
-            dst = _field.calcCircularDist(e.pos, p);
+        if (cast(MiddleEnemySpec) e.spec) {
+          float enemyDst = _field.calcCircularDist(e.pos, p);
+          if (enemyDst < dst) {
+            dst = enemyDst;
             ne = e;
           }
+        }
     }
     return ne;
   }
@@ -510,10 +514,13 @@ public class EnemySpec: TokenSpec!(EnemyState) {
       }
       if (capturable)
         checkCaptured(es);
-      float er = (1 - ellipseRatio) + fabs(sin(deg + ellipseDeg)) * ellipseRatio * 2;
+      const float deg2Sin = sin(deg + ellipseDeg);
+      float er = (1 - ellipseRatio) + fabs(deg2Sin) * ellipseRatio * 2;
       float rk = rank;
-      vel.x -= sin(deg) * speed * er * 0.1f * rk;
-      vel.y += cos(deg) * speed * er * 0.1f * rk;
+      const float degSin = sin(deg);
+      const float degCos = cos(deg);
+      vel.x -= degSin * speed * er * 0.1f * rk;
+      vel.y += degCos * speed * er * 0.1f * rk;
       vel *= 0.9f;
       pos += vel;
       if (isInScreen(es))

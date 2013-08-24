@@ -95,8 +95,10 @@ public class TokenState {
   }
 
   public void stepForward() {
-    pos.x -= sin(deg) * speed;
-    pos.y += cos(deg) * speed;
+    const float degSin = sin(deg);
+    const float degCos = cos(deg);
+    pos.x -= degSin * speed;
+    pos.y += degCos * speed;
   }
 }
 

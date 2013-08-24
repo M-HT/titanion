@@ -111,15 +111,16 @@ void gluOrtho2D(GLfloat left, GLfloat right, GLfloat bottom, GLfloat top)
 void gluPerspective(GLfloat fovy, GLfloat aspect, GLfloat zNear, GLfloat zFar)
 {
     GLfloat[16] m;
-    float sine, cotangent, deltaZ;
+    float sine, cosine, cotangent, deltaZ;
     float radians = fovy * std.math.PI / 360;
 
     deltaZ = zFar - zNear;
     sine = sin(radians);
+    cosine = cos(radians);
     if ((deltaZ == 0.0) || (sine == 0.0) || (aspect == 0.0)) {
         return;
     }
-    cotangent = cos(radians) / sine;
+    cotangent = cosine / sine;
 
     __gluMakeIdentityf(m);
     m[0+4*0] = cotangent / aspect;

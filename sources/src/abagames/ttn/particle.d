@@ -70,8 +70,10 @@ public class Particle: Token!(ParticleState, ParticleSpec) {
     this.spec = spec;
     super.set(x, y, deg, speed);
     state.size = sz;
-    state.vel.x = -sin(deg) * speed;
-    state.vel.y = cos(deg) * speed;
+    const float degSin = sin(deg);
+    const float degCos = cos(deg);
+    state.vel.x = -degSin * speed;
+    state.vel.y = degCos * speed;
     state.r = r;
     state.g = g;
     state.b = b;
