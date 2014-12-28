@@ -12,6 +12,10 @@ version (USE_GLES) {
 } else {
   private import opengl;
 }
+version (PANDORA) {
+    import std.conv;
+    import std.process;
+}
 private import abagames.util.rand;
 private import abagames.util.vector;
 private import abagames.util.sdl.frame;
@@ -413,6 +417,15 @@ public class GameState {
     _lastGameMode = mode;
     preference.recordResult(score, _mode);
     preference.save();
+
+    version (PANDORA) {
+      if (mode == Mode.CLASSIC)
+        system(escapeShellCommand("fusilli", "--cache", "push", "titanion_classic", to!string(score), "0") ~ " >/dev/null 2>&1");
+      else if (mode == Mode.BASIC)
+        system(escapeShellCommand("fusilli", "--cache", "push", "titanion_basic", to!string(score), "0") ~ " >/dev/null 2>&1");
+      else
+        system(escapeShellCommand("fusilli", "--cache", "push", "titanion_modern", to!string(score), "0") ~ " >/dev/null 2>&1");
+    }
   }
 
   public void startGameOverWithoutRecording() {

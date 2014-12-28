@@ -165,6 +165,15 @@ private void parseArgs(string[] commandArgs, Screen screen, RecordablePad pad, M
     case "-randomized":
       GameState.stageRandomized = true;
       break;
+    case "-c4amode":
+      if (i >= args.length - 1) {
+        usage(progName);
+        throw new Exception("Invalid options");
+      }
+      i++;
+      int c = to!int(args[i]);
+      Preference.C4Amode = c;
+      break;
     default:
       usage(progName);
       throw new Exception("Invalid options");
