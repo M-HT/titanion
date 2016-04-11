@@ -100,26 +100,32 @@ public class Field {
 
   public Vector3 calcCircularPos(float x, float y) {
     float d = calcCircularDeg(x);
+    const float dSin = sin(d);
+    const float dCos = cos(d);
     if (y < _size.y) {
-      circlePos.x = sin(d) * CIRCLE_RADIUS;
-      circlePos.z = cos(d) * CIRCLE_RADIUS;
+      circlePos.x = dSin * CIRCLE_RADIUS;
+      circlePos.z = dCos * CIRCLE_RADIUS;
       circlePos.y = y;
     } else if (y < _size.y * 3) {
       float cd = (y - _size.y) * PI / 2 / (_size.y * 2);
-      float cr = CIRCLE_RADIUS * (0.8f + 0.2f * cos(cd));
-      circlePos.x = sin(d) * cr;
-      circlePos.z = cos(d) * cr;
-      circlePos.y = _size.y + sin(cd) * CIRCLE_RADIUS * 0.2f;
+      const float cdSin = sin(cd);
+      const float cdCos = cos(cd);
+      float cr = CIRCLE_RADIUS * (0.8f + 0.2f * cdCos);
+      circlePos.x = dSin * cr;
+      circlePos.z = dCos * cr;
+      circlePos.y = _size.y + cdSin * CIRCLE_RADIUS * 0.2f;
     } else if (y < _size.y * 7) {
       float cd = (y - _size.y * 3) * PI / 2 / (_size.y * 4);
-      float cr = CIRCLE_RADIUS * (0.8f - 0.4f * sin(cd));
-      circlePos.x = sin(d) * cr;
-      circlePos.z = cos(d) * cr;
-      circlePos.y = _size.y - CIRCLE_RADIUS * 0.2f + cos(cd) * CIRCLE_RADIUS * 0.4f;
+      const float cdSin = sin(cd);
+      const float cdCos = cos(cd);
+      float cr = CIRCLE_RADIUS * (0.8f - 0.4f * cdSin);
+      circlePos.x = dSin * cr;
+      circlePos.z = dCos * cr;
+      circlePos.y = _size.y - CIRCLE_RADIUS * 0.2f + cdCos * CIRCLE_RADIUS * 0.4f;
     } else {
       float cr = CIRCLE_RADIUS * 0.4f;
-      circlePos.x = sin(d) * cr;
-      circlePos.z = cos(d) * cr;
+      circlePos.x = dSin * cr;
+      circlePos.z = dCos * cr;
       circlePos.y = _size.y - CIRCLE_RADIUS * 0.2f - (y - _size.y * 7);
     }
     return circlePos;
@@ -164,8 +170,10 @@ public class Field {
 
   public void setEyePos(Vector p) {
     eyeDeg = calcCircularDeg(p.x) * 0.25f;
-    _eyePos.x = sin(eyeDeg) * CIRCLE_RADIUS * EYE_POS_DIST_RATIO;
-    _eyePos.z = cos(eyeDeg) * CIRCLE_RADIUS * EYE_POS_DIST_RATIO;
+    const float eyeDegSin = sin(eyeDeg);
+    const float eyeDegCos = cos(eyeDeg);
+    _eyePos.x = eyeDegSin * CIRCLE_RADIUS * EYE_POS_DIST_RATIO;
+    _eyePos.z = eyeDegCos * CIRCLE_RADIUS * EYE_POS_DIST_RATIO;
   }
 
   public void setLookAt() {
@@ -246,16 +254,24 @@ public class Field {
     d1 = d1s;
     for (int i = 0; i < 16; i++, d1 += PI * 2 / 32) {
       float d2 = cnt * 0.003f;
+      const float d1Sin0 = sin(d1);
+      const float d1Cos0 = cos(d1);
+      const float d1Sin0TR = d1Sin0 * torusRad;
+      const float d1Cos0TR = d1Cos0 * torusRad;
+      const float d1Sin1 = sin(d1 + cast(float)(PI * 2 / 32));
+      const float d1Cos1 = cos(d1 + cast(float)(PI * 2 / 32));
+      const float d1Sin1TR = d1Sin1 * torusRad;
+      const float d1Cos1TR = d1Cos1 * torusRad;
       for (int j = 0; j < 16; j++, d2 += PI * 2 / 16) {
-        cp.x = sin(d1) * torusRad;
-        cp.z = cos(d1) * torusRad;
+        cp.x = d1Sin0TR;
+        cp.z = d1Cos0TR;
         createRingOffset(ringOfs, cp, ringRad, d1, d2);
         Screen.setColor(0.3f, 0.3f, 0.3f, 0.8f);
         Screen.glVertex(ringOfs);
         createRingOffset(ringOfs, cp, ringRad, d1, d2 + PI * 2 / 16);
         Screen.glVertex(ringOfs);
-        cp.x = sin(d1 + PI * 2 / 32) * torusRad;
-        cp.z = cos(d1 + PI * 2 / 32) * torusRad;
+        cp.x = d1Sin1TR;
+        cp.z = d1Cos1TR;
         createRingOffset(ringOfs, cp, ringRad, d1 + PI * 2 / 32, d2 + PI * 2 / 16);
         Screen.glVertex(ringOfs);
         createRingOffset(ringOfs, cp, ringRad, d1 + PI * 2 / 32, d2);
@@ -270,15 +286,23 @@ public class Field {
     d1 = d1s;
     for (int i = 0; i < 16; i++, d1 += PI * 2 / 32) {
       float d2 = cnt * 0.003f;
+      const float d1Sin2 = sin(d1 + cast(float)(PI * 2 / 32 * 0.1f));
+      const float d1Cos2 = cos(d1 + cast(float)(PI * 2 / 32 * 0.1f));
+      const float d1Sin2TR = d1Sin2 * torusRad;
+      const float d1Cos2TR = d1Cos2 * torusRad;
+      const float d1Sin3 = sin(d1 + cast(float)(PI * 2 / 32 * 0.9f));
+      const float d1Cos3 = cos(d1 + cast(float)(PI * 2 / 32 * 0.9f));
+      const float d1Sin3TR = d1Sin3 * torusRad;
+      const float d1Cos3TR = d1Cos3 * torusRad;
       for (int j = 0; j < 16; j++, d2 += PI * 2 / 16) {
-        cp.x = sin(d1 + PI * 2 / 32 * 0.1f) * torusRad;
-        cp.z = cos(d1 + PI * 2 / 32 * 0.1f) * torusRad;
+        cp.x = d1Sin2TR;
+        cp.z = d1Cos2TR;
         createRingOffset(ringOfs, cp, ringRad, d1 + PI * 2 / 32 * 0.1f, d2 + PI * 2 / 16 * 0.1f);
         Screen.glVertex(ringOfs);
         createRingOffset(ringOfs, cp, ringRad, d1 + PI * 2 / 32 * 0.1f, d2 + PI * 2 / 16 * 0.9f);
         Screen.glVertex(ringOfs);
-        cp.x = sin(d1 + PI * 2 / 32 * 0.9f) * torusRad;
-        cp.z = cos(d1 + PI * 2 / 32 * 0.9f) * torusRad;
+        cp.x = d1Sin3TR;
+        cp.z = d1Cos3TR;
         createRingOffset(ringOfs, cp, ringRad, d1 + PI * 2 / 32 * 0.9f, d2 + PI * 2 / 32 * 0.1f);
         Screen.glVertex(ringOfs);
         createRingOffset(ringOfs, cp, ringRad, d1 + PI * 2 / 32 * 0.9f, d2 + PI * 2 / 16 * 0.9f);

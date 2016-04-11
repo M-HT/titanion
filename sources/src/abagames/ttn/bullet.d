@@ -143,10 +143,12 @@ public class BulletSpec: TokenSpec!(BulletState) {
       float sp = speed;
       if (gameState.mode != GameState.Mode.CLASSIC && cnt < 40)
         sp *= (cast(float) (cnt + 10) / 50);
-      tailPos.x -= sin(deg) * sp * 0.7f;
-      tailPos.y += cos(deg) * sp * 0.7f;
-      pos.x -= sin(deg) * sp;
-      pos.y += cos(deg) * sp;
+      const float degSin = sin(deg);
+      const float degCos = cos(deg);
+      tailPos.x -= degSin * sp * 0.7f;
+      tailPos.y += degCos * sp * 0.7f;
+      pos.x -= degSin * sp;
+      pos.y += degCos * sp;
       field.addSlowdownRatio(speed * 0.04f);
       pos.x = field.normalizeX(pos.x);
       if (!field.containsOuter(pos))

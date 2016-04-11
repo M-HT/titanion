@@ -457,7 +457,8 @@ public class PlayerSpec: TokenSpec!(PlayerState) {
         float d = ghostCnt * 0.05f;
         for (int i = 0; i < capturedEnemyNum; i++) {
           Enemy e = capturedEnemies[i];
-          e.setGhostEnemyState(pos.x + sin(d) * capturedEnemyWidth * 2, pos.y, deg, cast(int) (d * 180 / PI / 3));
+          const float dSin = sin(d);
+          e.setGhostEnemyState(pos.x + dSin * capturedEnemyWidth * 2, pos.y, deg, cast(int) (d * 180 / PI / 3));
           d += PI / 2;
         }
       }
