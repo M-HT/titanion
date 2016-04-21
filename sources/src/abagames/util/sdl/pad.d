@@ -6,6 +6,7 @@
 module abagames.util.sdl.pad;
 
 private import std.string;
+private import std.conv;
 private import std.stdio;
 private import SDL;
 private import abagames.util.sdl.input;
@@ -31,7 +32,15 @@ public class Pad: Input {
     if (st == null) {
       if (SDL_InitSubSystem(SDL_INIT_JOYSTICK) < 0)
         return null;
-      stick = SDL_JoystickOpen(0);
+      version (PANDORA) {
+        foreach (i; 0..SDL_NumJoysticks()) {
+          if (to!string(SDL_JoystickName(i)) == "nub0") {
+            stick = SDL_JoystickOpen(i);
+          }
+        }
+      } else {
+        stick = SDL_JoystickOpen(0);
+      }
     } else {
       stick = st;
     }
@@ -66,6 +75,7 @@ public class Pad: Input {
         y < -JOYSTICK_AXIS)
       state.dir |= PadState.Dir.UP;
     state.button = 0;
+    bool btnx = false, btnz = false;
     int btn1 = 0, btn2 = 0;
     float leftTrigger = 0, rightTrigger = 0;
     if (stick) {
@@ -76,19 +86,26 @@ public class Pad: Input {
              SDL_JoystickGetButton(stick, 5) + SDL_JoystickGetButton(stick, 7) +
              SDL_JoystickGetButton(stick, 9) + SDL_JoystickGetButton(stick, 11);
     }
-    if (keys[SDLK_z] == SDL_PRESSED || keys[SDLK_PERIOD] == SDL_PRESSED ||
-        keys[SDLK_LCTRL] == SDL_PRESSED || keys[SDLK_RCTRL] == SDL_PRESSED ||
-        btn1) {
+    version (PANDORA) {
+      if (keys[SDLK_HOME] == SDL_PRESSED || keys[SDLK_PAGEUP] == SDL_PRESSED) btnz = true;
+      if (keys[SDLK_PAGEDOWN] == SDL_PRESSED || keys[SDLK_END] == SDL_PRESSED) btnx = true;
+    } else {
+      if (keys[SDLK_z] == SDL_PRESSED || keys[SDLK_PERIOD] == SDL_PRESSED ||
+          keys[SDLK_LCTRL] == SDL_PRESSED || keys[SDLK_RCTRL] == SDL_PRESSED ||
+          btn1) btnz = true;
+      if (keys[SDLK_x] == SDL_PRESSED || keys[SDLK_SLASH] == SDL_PRESSED ||
+          keys[SDLK_LALT] == SDL_PRESSED || keys[SDLK_RALT] == SDL_PRESSED ||
+          keys[SDLK_LSHIFT] == SDL_PRESSED || keys[SDLK_RSHIFT] == SDL_PRESSED ||
+          keys[SDLK_RETURN] == SDL_PRESSED ||
+          btn2) btnx = true;
+    }
+    if (btnz) {
       if (!buttonsExchanged)
         state.button |= PadState.Button.A;
       else
         state.button |= PadState.Button.B;
     }
-    if (keys[SDLK_x] == SDL_PRESSED || keys[SDLK_SLASH] == SDL_PRESSED ||
-        keys[SDLK_LALT] == SDL_PRESSED || keys[SDLK_RALT] == SDL_PRESSED ||
-        keys[SDLK_LSHIFT] == SDL_PRESSED || keys[SDLK_RSHIFT] == SDL_PRESSED ||
-        keys[SDLK_RETURN] == SDL_PRESSED ||
-        btn2) {
+    if (btnx) {
       if (!buttonsExchanged)
         state.button |= PadState.Button.B;
       else

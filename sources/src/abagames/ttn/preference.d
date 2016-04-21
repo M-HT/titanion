@@ -15,6 +15,7 @@ public class Preference: abagames.util.preference.Preference {
  public:
   static const int RANKING_NUM = 10;
   static const int MODE_NUM = 3;
+  static int C4Amode = 0;
  private:
   static const int VERSION_NUM = 30;
   static string PREF_FILE_NAME = "ttn.prf";
@@ -37,6 +38,14 @@ public class Preference: abagames.util.preference.Preference {
     } finally {
       if (fd.isOpen())
         fd.close();
+    }
+
+    if (C4Amode == 1) {
+        _lastMode = 0;
+    } else if (C4Amode == 2) {
+        _lastMode = 1;
+    } else if (C4Amode == 3) {
+        _lastMode = 2;
     }
   }
 

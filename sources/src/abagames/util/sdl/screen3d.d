@@ -24,7 +24,13 @@ public class Screen3D: Screen, SizableScreen {
   float _nearPlane = 0.1;
   int _width = 640;
   int _height = 480;
+  int _startx = 0;
+  int _starty = 0;
+version (PANDORA) {
+  bool _windowMode = false;
+} else {
   bool _windowMode = true;
+}
 
   protected abstract void init();
   protected abstract void close();
@@ -44,11 +50,21 @@ public class Screen3D: Screen, SizableScreen {
     } else {
       videoFlags = SDL_OPENGL | SDL_FULLSCREEN;
     }
-    if (SDL_SetVideoMode(_width, _height, 0, videoFlags) == null) {
+    int physical_width = _width;
+    int physical_height = _height;
+    version (PANDORA) {
+      if (!windowMode) {
+        physical_width = 800;
+        physical_height = 480;
+        _startx = (800 - _width) / 2;
+        _starty = (480 - _height) / 2;
+      }
+    }
+    if (SDL_SetVideoMode(physical_width, physical_height, 0, videoFlags) == null) {
       throw new SDLInitFailedException
         ("Unable to create SDL screen: " ~ to!string(SDL_GetError()));
     }
-    glViewport(0, 0, _width, _height);
+    glViewport(_startx, _starty, _width, _height);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     resized(_width, _height);
     SDL_ShowCursor(SDL_DISABLE);
@@ -57,7 +73,7 @@ public class Screen3D: Screen, SizableScreen {
 
   // Reset a viewport when the screen is resized.
   public void screenResized() {
-    glViewport(0, 0, _width, _height);
+    glViewport(_startx, _starty, _width, _height);
     glMatrixMode(GL_PROJECTION);
     setPerspective();
     glMatrixMode(GL_MODELVIEW);
@@ -127,6 +143,14 @@ public class Screen3D: Screen, SizableScreen {
 
   public int height() {
     return _height;
+  }
+
+  public int startx() {
+    return _startx;
+  }
+
+  public int starty() {
+    return _starty;
   }
 
   public static void glVertex(Vector v) {
