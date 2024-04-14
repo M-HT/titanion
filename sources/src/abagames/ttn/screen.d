@@ -6,7 +6,7 @@
 module abagames.ttn.screen;
 
 private import std.string;
-private import SDL;
+private import bindbc.sdl;
 private import opengl;
 //private import openglu;
 private import abagames.util.sdl.screen3d;
@@ -22,7 +22,7 @@ public class Screen: Screen3D {
   Field field;
 
   protected override void setIcon() {
-    SDL_WM_SetIcon(SDL_LoadBMP(std.string.toStringz(ICON_FILE_NAME)), null);
+    SDL_SetWindowIcon(window, SDL_LoadBMP(std.string.toStringz(ICON_FILE_NAME)));
   }
 
   protected override void init() {
@@ -47,13 +47,13 @@ public class Screen: Screen3D {
 
   public override void screenResized() {
     super.screenResized();
-    float lw = (cast(float) width / 640 + cast(float) height / 480) / 2;
+    float lw = (cast(float) screenWidth / 640 + cast(float) screenHeight / 480) / 2;
     if (lw < 1)
       lw = 1;
     else if (lw > 4)
       lw = 4;
     glLineWidth(lw);
-    glViewport(startx, starty, width, height);
+    glViewport(screenStartX, screenStartY, screenWidth, screenHeight);
     if (field)
       field.setLookAt();
   }

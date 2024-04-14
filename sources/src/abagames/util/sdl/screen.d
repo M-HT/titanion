@@ -10,6 +10,7 @@ module abagames.util.sdl.screen;
  */
 public interface Screen {
   public void initSDL();
+  public void resized(int width, int height);
   public void closeSDL();
   public void flip();
   public void clear();
@@ -17,6 +18,6 @@ public interface Screen {
 
 public interface SizableScreen {
   public bool windowMode();
-  public int width();
-  public int height();
+  public int screenWidth();
+  public int screenHeight();
 }

@@ -5,21 +5,21 @@
  */
 module abagames.util.sdl.input;
 
-private import SDL;
+private import bindbc.sdl;
 
 /**
  * Input device interface.
  */
 public interface Input {
-  public void handleEvent(SDL_Event *event);
+  public void handleEvents();
 }
 
 public class MultipleInputDevice: Input {
  public:
   Input[] inputs;
 
-  public void handleEvent(SDL_Event *event) {
+  public void handleEvents() {
     foreach (Input i; inputs)
-      i.handleEvent(event);
+      i.handleEvents();
   }
 }

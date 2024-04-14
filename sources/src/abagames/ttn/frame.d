@@ -6,7 +6,7 @@
 module abagames.ttn.frame;
 
 private import std.math;
-private import SDL;
+private import bindbc.sdl;
 private import opengl;
 version (PANDORA) {
     import std.conv;
@@ -192,12 +192,6 @@ public class Frame: abagames.util.sdl.frame.Frame {
   }
 
   public override void draw() {
-    SDL_Event e = mainLoop.event;
-    if (e.type == SDL_VIDEORESIZE) {
-      SDL_ResizeEvent re = e.resize;
-      if (re.w > 150 && re.h > 100)
-        screen.resized(re.w, re.h);
-    }
     field.setLookAt();
     if (gameState.isInGame || replayData) {
       version (PANDORA) {
@@ -265,7 +259,7 @@ public class Frame: abagames.util.sdl.frame.Frame {
     }
   }
 
-  public Uint8* keys() {
+  public ubyte* keys() {
     return pad.keys;
   }
 
@@ -478,7 +472,7 @@ public class GameState {
   }
 
   private void handleEscKey() {
-    if (frame.keys[SDLK_ESCAPE] == SDL_PRESSED) {
+    if (frame.keys[SDL_SCANCODE_ESCAPE] == SDL_PRESSED) {
       if (!escPressed) {
         escPressed = true;
         if (scene == Scene.IN_GAME) {
@@ -494,7 +488,7 @@ public class GameState {
   }
 
   private void handlePauseKey() {
-    if (frame.keys[SDLK_p] == SDL_PRESSED) {
+    if (frame.keys[SDL_SCANCODE_P] == SDL_PRESSED) {
       if (!pPressed) {
         pPressed = true;
         _paused = !_paused;

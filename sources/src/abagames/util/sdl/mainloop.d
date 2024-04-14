@@ -5,7 +5,7 @@
  */
 module abagames.util.sdl.mainloop;
 
-private import SDL;
+private import bindbc.sdl;
 private import abagames.util.logger;
 private import abagames.util.rand;
 private import abagames.util.preference;
@@ -23,7 +23,6 @@ public class MainLoop {
   const int INTERVAL_BASE = 16;
   const int MAX_SKIP_FRAME = 5;
   bool noSlowdown = false;
-  SDL_Event event;
  private:
   Screen screen;
   Input input;
@@ -77,15 +76,27 @@ public class MainLoop {
     int i;
     long nowTick;
     int frameNum;
+    SDL_Event event;
     screen.initSDL();
     initFirst();
     frame.start();
     while (!done) {
-      if (SDL_PollEvent(&event) == 0)
-        event.type = SDL_USEREVENT;
-      input.handleEvent(&event);
-      if (event.type == SDL_QUIT)
-        breakLoop();
+      while (!done && SDL_PollEvent(&event)) {
+        switch (event.type) {
+          case SDL_QUIT:
+            breakLoop();
+            break;
+          case SDL_WINDOWEVENT:
+            if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
+              if (event.window.data1 > 150 && event.window.data2 > 100)
+                screen.resized(event.window.data1, event.window.data2);
+            }
+            break;
+          default:
+            break;
+        }
+      }
+      input.handleEvents();
       nowTick = SDL_GetTicks();
       int itv = cast(int) interval;
       frameNum = cast(int) (nowTick - prvTickCount) / itv;
