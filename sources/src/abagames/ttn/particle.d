@@ -114,23 +114,23 @@ public class ParticleState: TokenState {
 
   invariant() {
     if (isInitialized) {
-      assert(pos.x <>= 0);
-      assert(pos.y <>= 0);
-      assert(vel.x <>= 0);
-      assert(vel.y <>= 0);
-      assert(tailPos.x <>= 0);
-      assert(tailPos.y <>= 0);
+      assert(!std.math.isNaN(pos.x));
+      assert(!std.math.isNaN(pos.y));
+      assert(!std.math.isNaN(vel.x));
+      assert(!std.math.isNaN(vel.y));
+      assert(!std.math.isNaN(tailPos.x));
+      assert(!std.math.isNaN(tailPos.y));
       assert(size > 0 && size < 20);
       assert(r >= 0 && r <= 1);
       assert(g >= 0 && g <= 1);
       assert(b >= 0 && b <= 1);
       assert(a >= 0 && a <= 1);
-      assert(d1 <>= 0);
-      assert(d2 <>= 0);
-      assert(vd1 <>= 0);
-      assert(vd2 <>= 0);
-      assert(num <>= 0);
-      assert(trgNum <>= 0);
+      assert(!std.math.isNaN(d1));
+      assert(!std.math.isNaN(d2));
+      assert(!std.math.isNaN(vd1));
+      assert(!std.math.isNaN(vd2));
+      assert(!std.math.isNaN(num));
+      assert(!std.math.isNaN(trgNum));
       assert(trgSize > 0);
     }
   }
@@ -238,7 +238,7 @@ public class TriangleParticleSpec: ParticleSpec {
           p.setByVelocity(pos.x, pos.y, vx, vy, size * fs, r, g, b, a,
                           nc, effectedByGravity);
         size *= (1 - fs);
-        cnt *= cr;
+        cnt = cast(int)(cnt * cr);
       }
       cnt--;
       if (cnt <= 0)

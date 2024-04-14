@@ -510,7 +510,7 @@ public class GameState {
       if (noMultiplier)
         score += sc;
       else
-        score += sc * _multiplier;
+        score += cast(int)(sc * _multiplier);
       if (score >= nextExtendScore) {
         if (left < MAX_LEFT) {
           left++;

@@ -128,7 +128,7 @@ public class BulletSpec: TokenSpec!(BulletState) {
       ppos.y = pos.y;
       tailPos.x = pos.x;
       tailPos.y = pos.y;
-      assert(deg <>= 0);
+      assert(!std.math.isNaN(deg));
     }
   }
 

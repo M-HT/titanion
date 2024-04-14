@@ -6,6 +6,7 @@
 module abagames.ttn.pillar;
 
 private import std.math;
+private import std.algorithm;
 private import abagames.util.actor;
 private import abagames.ttn.field;
 private import abagames.ttn.token;
@@ -25,10 +26,11 @@ public class PillarPool: ActorPool!(Pillar) {
   }
 
   public void drawCenter() {
-    Pillar[] sas = actors.sort;
-    foreach (Pillar a; sas)
+    foreach (Object o; sort(cast(Object[])actors)) {
+      Pillar a = cast(Pillar) o;
       if (a.exists && !a.state.isOutside)
         a.draw();
+    }
   }
 
   public void drawOutside() {

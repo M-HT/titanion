@@ -184,10 +184,10 @@ public class PlayerState: TokenState {
 
   invariant() {
     if (isInitialized) {
-      assert(vel.x <>= 0);
-      assert(vel.y <>= 0);
+      assert(!std.math.isNaN(vel.x));
+      assert(!std.math.isNaN(vel.y));
       assert(capturedEnemyWidth >= 0);
-      assert(captureBeamEnergy <>= 0);
+      assert(!std.math.isNaN(captureBeamEnergy));
     }
   }
 
@@ -450,7 +450,7 @@ public class PlayerSpec: TokenSpec!(PlayerState) {
       pos.y += (vy * speed);
       if (!(input.button & PadState.Button.B))
         deg += (-TILT_DEG * (vx * speed) - deg) * 0.1f;
-      assert(deg <>= 0);
+      assert(!std.math.isNaN(deg));
       pos += vel;
       vel *= 0.9f;
       if (gameState.mode == GameState.Mode.MODERN) {
@@ -593,9 +593,9 @@ public class PlayerSpec: TokenSpec!(PlayerState) {
         s.set(shotSpec, pos, deg, 0.66f);
         if (isFirstShot) {
           isFirstShot = false;
-          shotCnt += FIRST_SHOT_INTERVAL;
+          shotCnt += cast(int)FIRST_SHOT_INTERVAL;
         } else {
-          shotCnt += SHOT_INTERVAL;
+          shotCnt += cast(int)SHOT_INTERVAL;
         }
         gameState.countShotFired();
         addShotParticle(pos, deg);
@@ -877,7 +877,7 @@ public class TractorBeam {
   bool isExtending;
 
   invariant() {
-    assert(length <>= 0);
+    assert(!std.math.isNaN(length));
   }
 
   public this(Field field, PlayerState playerState, GameState gameState) {

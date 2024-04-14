@@ -333,19 +333,19 @@ public class EnemyState: TokenState {
       assert(baseSpeed >= 0);
       assert(baseAngVel >= 0);
       assert(angVel >= 0);
-      assert(centerPos.x <>= 0);
-      assert(centerPos.y <>= 0);
-      assert(centerVel.x <>= 0);
-      assert(centerVel.y <>= 0);
-      assert(shield <>= 0);
+      assert(!std.math.isNaN(centerPos.x));
+      assert(!std.math.isNaN(centerPos.y));
+      assert(!std.math.isNaN(centerVel.x));
+      assert(!std.math.isNaN(centerVel.y));
+      assert(!std.math.isNaN(shield));
       assert(captureState >= 0);
-      assert(size.x <>= 0);
-      assert(size.y <>= 0);
-      assert(targetSize.x <>= 0);
-      assert(targetSize.y <>= 0);
-      assert(sizeVel.x <>= 0);
-      assert(sizeVel.y <>= 0);
-      assert(anger <>= 0);
+      assert(!std.math.isNaN(size.x));
+      assert(!std.math.isNaN(size.y));
+      assert(!std.math.isNaN(targetSize.x));
+      assert(!std.math.isNaN(targetSize.y));
+      assert(!std.math.isNaN(sizeVel.x));
+      assert(!std.math.isNaN(sizeVel.y));
+      assert(!std.math.isNaN(anger));
     }
   }
 
@@ -552,7 +552,7 @@ public class EnemySpec: TokenSpec!(EnemyState) {
           deg -= av;
         else
           deg = td;
-        assert(deg <>= 0);
+        assert(!std.math.isNaN(deg));
         for (int i = 0; i < turretNum; i++) {
           TurretState ts = turretStates[i];
           float tx = pos.x;
@@ -729,7 +729,7 @@ public class EnemySpec: TokenSpec!(EnemyState) {
       float sz = (targetSize.x + targetSize.y) / 2;
       sz = (sz - 1) * 2 + 1;
       int n = 3 + rand.nextInt(2);
-      n *= sz;
+      n = cast(int)(n * sz);
       for (int i = 0; i < n; i++) {
         Particle p = particles.getInstanceForced();
         float d = dd + rand.nextSignedFloat(PI / 5);
@@ -925,7 +925,7 @@ public class EnemySpec: TokenSpec!(EnemyState) {
       default:
         return false;
       }
-      nextPhaseCnt /= rank;
+      nextPhaseCnt = cast(int)(nextPhaseCnt / rank);
       phaseCnt = 0;
     }
     return true;
@@ -1010,9 +1010,9 @@ public class Trail {
   int cnt;
 
   invariant() {
-    assert(pos.x <>= 0);
-    assert(pos.y <>= 0);
-    assert(deg <>= 0);
+    assert(!std.math.isNaN(pos.x));
+    assert(!std.math.isNaN(pos.y));
+    assert(!std.math.isNaN(deg));
   }
 
   public this() {
@@ -1240,7 +1240,7 @@ public class MiddleEnemySpec: EnemySpec {
       default:
         return false;
       }
-      nextPhaseCnt /= rank;
+      nextPhaseCnt = cast(int)(nextPhaseCnt / rank);
       phaseCnt = 0;
     }
     return true;
@@ -1378,7 +1378,7 @@ private:
       default:
         break;
       }
-      nextPhaseCnt /= rank;
+      nextPhaseCnt = cast(int)(nextPhaseCnt / rank);
       phaseCnt = 0;
     }
     return true;
@@ -1445,7 +1445,7 @@ private:
       default:
         break;
       }
-      nextPhaseCnt /= rank;
+      nextPhaseCnt = cast(int)(nextPhaseCnt / rank);
       phaseCnt = 0;
     }
     return true;
@@ -1479,8 +1479,8 @@ public class TurretState: TokenState {
 
   invariant() {
     if (isInitialized) {
-      assert(fireCnt <>= 0);
-      assert(burstCnt <>= 0);
+      assert(!std.math.isNaN(fireCnt));
+      assert(!std.math.isNaN(burstCnt));
     }
   }
 
@@ -1531,10 +1531,10 @@ public class TurretSpec: TokenSpec!(TurretState) {
     assert(burstInterval >= 0);
     assert(nway >= 1);
     assert(nwayAngle >= 0);
-    assert(nwayBaseDeg <>= 0);
-    assert(nwaySpeedAccel <>= 0);
-    assert(fireIntervalRatio <>= 0);
-    assert(minimumFireDist >= 0);
+    assert(!std.math.isNaN(nwayBaseDeg));
+    assert(!std.math.isNaN(nwaySpeedAccel));
+    assert(!std.math.isNaN(fireIntervalRatio));
+    assert(!std.math.isNaN(minimumFireDist));
   }
 
   public this(Field field, BulletPool bullets, Player player,

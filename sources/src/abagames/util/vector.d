@@ -35,7 +35,7 @@ public class Vector {
     x = y = 0;
   }
 
-  public float opMul(Vector v) {
+  public float opBinary(string op : "*")(Vector v) {
     return x * v.x + y * v.y;
   }
 
@@ -69,22 +69,22 @@ public class Vector {
     return rsl;
   }
 
-  public void opAddAssign(Vector v) {
+  public void opOpAssign(string op: "+")(Vector v) {
     x += v.x;
     y += v.y;
   }
 
-  public void opSubAssign(Vector v) {
+  public void opOpAssign(string op: "-")(Vector v) {
     x -= v.x;
     y -= v.y;
   }
 
-  public void opMulAssign(float a) {
+  public void opOpAssign(string op: "*")(float a) {
     x *= a;
     y *= a;
   }
 
-  public void opDivAssign(float a) {
+  public void opOpAssign(string op: "/")(float a) {
     x /= a;
     y /= a;
   }
@@ -342,29 +342,29 @@ public class Vector3 {
     return rsl;
   }
 
-  public float opMul(Vector3 v) {
+  public float opBinary(string op : "*")(Vector3 v) {
     return x * v.x + y * v.y + z * v.z;
   }
 
-  public void opAddAssign(Vector3 v) {
+  public void opOpAssign(string op: "+")(Vector3 v) {
     x += v.x;
     y += v.y;
     z += v.z;
   }
 
-  public void opSubAssign(Vector3 v) {
+  public void opOpAssign(string op: "-")(Vector3 v) {
     x -= v.x;
     y -= v.y;
     z -= v.z;
   }
 
-  public void opMulAssign(float a) {
+  public void opOpAssign(string op: "*")(float a) {
     x *= a;
     y *= a;
     z *= a;
   }
 
-  public void opDivAssign(float a) {
+  public void opOpAssign(string op: "/")(float a) {
     x /= a;
     y /= a;
     z /= a;

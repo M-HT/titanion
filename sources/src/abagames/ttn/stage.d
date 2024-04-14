@@ -262,9 +262,9 @@ public class Stage {
     if (rand.nextFloat(rank + 1) > 2)
       goingDownBeforeStandByRatio = rand.nextFloat(0.2f) + 0.1f;
     appCntInterval = 48 + rand.nextSignedInt(10);
-    appCntInterval *= (0.5f + 0.5f / sqrt(rank));
+    appCntInterval = cast(int)(appCntInterval * (0.5f + 0.5f / sqrt(rank)));
     if (gameState.mode == GameState.Mode.MODERN) {
-      appCntInterval *= 0.75f;
+      appCntInterval = cast(int)(appCntInterval * 0.75f);
       _attackSmallEnemyNum *= 2;
     }
     appCnt = 0;

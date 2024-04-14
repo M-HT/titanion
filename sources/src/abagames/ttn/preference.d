@@ -25,7 +25,7 @@ public class Preference: abagames.util.preference.Preference {
   public void load() {
     scope File fd;
     try {
-      int read_data[1];
+      int[1] read_data;
       fd.open(PREF_FILE_NAME);
       fd.rawRead(read_data);
       if (read_data[0] != VERSION_NUM)
@@ -60,7 +60,7 @@ public class Preference: abagames.util.preference.Preference {
     scope File fd;
     try {
       fd.open(PREF_FILE_NAME, "wb");
-      int write_data[2] = [VERSION_NUM, _lastMode];
+      int[2] write_data = [VERSION_NUM, _lastMode];
       fd.rawWrite(write_data);
       fd.rawWrite(_highScore);
     } finally {
